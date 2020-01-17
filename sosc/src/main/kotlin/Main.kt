@@ -1,3 +1,4 @@
+
 /**
  * The entry point into the program. The first argument should be
  * the file written in sos that they want compiled.
@@ -19,6 +20,6 @@ fun main(args: Array<String>) {
  */
 class Parser constructor(private val path: String) {
     fun parse() {
-        print(Emoji.Emojis.ONE)
+        print(Emojis.ONE)
     }
 }
