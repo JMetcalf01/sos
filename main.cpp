@@ -1,18 +1,38 @@
 #include <iostream>
-#include "variablestack.h"
+#include <fstream>
+#include <map>
 
-using namespace sos;
+void testFunction();
+
+using namespace std;
 
 int main() {
-    VariableStack stack;
+    std::cout << "Hello, World!" << std::endl;
 
-    stack.load("Hello, World");
-
-
-
-    std::cout << stack.take() << std::endl;
-
-    stack.take();
 
     return 0;
 }
+void parserLine(ifstream file)
+{
+    string str;
+    while (getline(file, str)) {
+
+        std::map<std::string, void (*) ()>  operation;
+        operation.insert(std::pair<std::string, void (*) ()>("This is a test", testFunction));
+// map (string, functionObject)
+
+
+    }
+}
+
+void testFunction() {
+    std::cout << "This is a test function" << std::endl;
+}
+
+ifstream openFile(string fileName)
+{
+    ifstream file(fileName);
+    return file;
+}
+
+
