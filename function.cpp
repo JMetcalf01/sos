@@ -1,7 +1,7 @@
 #include "function.h"
 
-sos::Function::Function(std::map<std::string, void (*)(std::map<>, VariableStack*)> *instructions, std::string &name,
-                        std::vector<std::string> params, std::vector<std::string> &lines, int start, int end) {
+sos::Function::Function(std::map<std::string, void (*)(std::map<std::string, std::string>*, VariableStack*, int*)> *instructions,
+        std::string &name, std::vector<std::string> &params, std::vector<std::string> &lines, int start, int end) {
     m_instructions = instructions;
     m_name = name;
     m_params = params;
@@ -20,9 +20,6 @@ void sos::Function::execute(sos::VariableStack *stack) {
     for (const std::string& param : m_params)
         memory.insert(std::pair(param, stack->take()));
 
-    int* =
-    for (int i = 0; i < m_body->size(); i++) {
-        m_instructions->find()->second();
-
-    }
+    for (int i = 0; i < m_body->size(); i++)
+        m_instructions->find("")->second(&memory, stack, &i);
 }
