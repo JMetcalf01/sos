@@ -4,9 +4,6 @@
  * @author Jonathan Metcalf
  */
 enum class TokenType(val unicode: String?) {
-    UNKNOWN(null),
-    NEW_LINE("\\n"),
-    SPACE(" "),
     FUNC("\uD83D\uDCDD"),
     MAIN("\uD83D\uDCAF"),
     IF("\uD83E\uDD14"),
@@ -41,7 +38,10 @@ enum class TokenType(val unicode: String?) {
     SEVEN("\u0037\uFE0F\u20E3"),
     EIGHT("\u0038\uFE0F\u20E3"),
     NINE("\u0039\uFE0F\u20E3"),
-    INFINITY("\u267E");
+    INFINITY("\u267E"),
+    NEW_LINE("\\n"),
+    SPACE(" "),
+    UNKNOWN(null);
 }
 
 /**
