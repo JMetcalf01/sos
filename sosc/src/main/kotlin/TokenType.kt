@@ -7,7 +7,7 @@ enum class TokenType(val unicode: String?) {
     FUNC("\uD83D\uDCDD"),
     MAIN("\uD83D\uDCAF"),
     IF("\uD83E\uDD14"),
-    ELIF("\uD83E\uDD37\u200D\uD83E\uDD14"),
+    ELSEIF("\uD83E\uDD37\u200D\uD83E\uDD14"),
     ELSE("\uD83D\uDC49"),
     LEFT_PARENTHESES("\uD83C\uDF1C"),
     RIGHT_PARENTHESES("\uD83C\uDF1B"),
@@ -19,14 +19,13 @@ enum class TokenType(val unicode: String?) {
     LESS_THAN("\u25C0"),
     MORE_THAN("\u25B6"),
     CONTINUE("\u23ED"),
-    QUOTEMARK("\uD83D\uDD24"),
+    QUOTE_MARK("\uD83D\uDD24"),
     VAR("\uD83D\uDCB2"),
     BRACE("\uD83D\uDD36"),
     ERROR("\u2622"),
     EQUALS("\uD83C\uDF9E"),
     IMPORT("\u27A1"),
     RETURN("\u2B05"),
-    PRINT("\uD83D\uDDA8"),
     COMMENT("\uD83E\uDD56\uD83E\uDD56"),
     ZERO("\u0030\uFE0F\u20E3"),
     ONE("\u0031\uFE0F\u20E3"),
@@ -52,7 +51,7 @@ enum class TokenType(val unicode: String?) {
  * @property tokenType the type of the token
  * @property unicode the unicode representation of the token
  */
-class Token(private val tokenType: TokenType, private val unicode: String) {
+class Token(val tokenType: TokenType, val unicode: String) {
     override fun toString(): String {
         return if (tokenType == TokenType.UNKNOWN) unicode else tokenType.name
     }
