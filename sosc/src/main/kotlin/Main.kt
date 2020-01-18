@@ -49,22 +49,29 @@ class Parser constructor(private val inputPath: String, private val outputPath: 
         // Tokenize it
         var i = 0
         here@while (i < file.length) {
+            // Check every keyword
             for (special in TokenType.values()) {
                 if (i >= file.length) break
-                if (special.unicode != null) {
-                    if (file.substring(i).startsWith(special.unicode)) {
+                if (special.unicode != null && file.substring(i).startsWith(special.unicode)) {
                         tokens.add(Token(special, special.unicode))
                         i += if (special == TokenType.NEW_LINE) 3 else special.unicode.length
                         continue@here
-                    } else {
-                        val str = file.substring(i)
-                        val name = str.substring(0, str.indexOf(' '))
+                }
+            }
+
+            // If it gets here, then it is an unknown variable and we need to detect it.
+            val current = file.substring(i)
+
+            for (x in 0..current.length) {
+                for (special in TokenType.values()) {
+                    if (special.unicode != null && current.substring(x).startsWith(special.unicode)) {
+                        val name = current.substring(0, x)
                         tokens.add(Token(TokenType.UNKNOWN, name))
                         i += name.length
+                        continue@here
                     }
                 }
             }
-            i++
         }
 
         println(tokens)
