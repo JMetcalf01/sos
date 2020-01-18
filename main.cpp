@@ -1,10 +1,11 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include "variablestack.h"
+
+using namespace sos;
 
 void testFunction();
-
-using namespace std;
 
 int main() {
     std::cout << "Hello, World!" << std::endl;
@@ -12,9 +13,11 @@ int main() {
 
     return 0;
 }
-void parserLine(ifstream file)
+void parserLine(std::ifstream file)
 {
-    string str;
+
+    VariableStack stack;
+    std::string str;
     while (getline(file, str)) {
 
         std::map<std::string, void (*) ()>  operation;
@@ -29,9 +32,9 @@ void testFunction() {
     std::cout << "This is a test function" << std::endl;
 }
 
-ifstream openFile(string fileName)
+std::ifstream openFile(std::string fileName)
 {
-    ifstream file(fileName);
+    std::ifstream file(fileName);
     return file;
 }
 
