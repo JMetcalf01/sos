@@ -1,12 +1,13 @@
 # Commands
 func FUNC_NAME PARAM_NAME...    Start function definition. Function is ended by an empty line
 call FUNC_NAME                  Call a named function. The parameters must be loaded to the "stack" using `load` or `loadr` before call.
-store VAR_NAME VALUE            Assign a name to a value. This may be used multiple times to reassign.
+store VAR_NAME VALUE            Assign a name to a value. This may be used multiple times to reassign. If no value is given, it will take an element off the stack.
 load VAR_NAME                   Load a variable by name to the "stack"
 loadr VALUE                     Load a raw value to the "stack"
-read VAR_NAME                   Reads a line of user input and assigns the value to the variable.
-goto LINE_NUMBER                Go to a defined position (it may be defined after the goto, and will be searched).
+read                            Reads a line of user input and puts it on the stack.
+goto LINE_NUMBER                Go to a defined position.
 exit                            Return. The first value on the "stack" will be returned. There is an implicit return at the end of a function.
+if                              Requires a 1 or 0 to be on the stack. Will execute the line after if 1, or two lines after if 0.
 
 # Hello World
 func 💯                 // Start function with name `main`
@@ -15,20 +16,20 @@ call 🖨                 // Call function named 🖨
 
 # Hello World x10
 func 💯
-0  store 😂 0
-1  load 😂
-2  loadr 10
-3  <
-4  goto 6
-5  exit
-6  store 😋 Hello World
-7  load 😋
-8  call 🖨
-9  load 😂
-10 loadr 1
-11 +
-12 store 😂
-13 goto 1
+store 😂 0
+load 😂
+loadr 10
+<
+goto 6
+exit
+store 😋 Hello World
+load 😋
+call 🖨
+load 😂
+loadr 1
++
+store 😂
+goto 1
 
 func ⬆ ❤ 💙
 0 load ❤
@@ -41,5 +42,16 @@ func ⬆ ❤ 💙
 7 load ❤
 8 exit
 
-
+# Super basic if
+func 🤷‍
+loadr 1
+loadr 2
+call <
+if
+goto 8
+loadr No
+call print
+exit
+loadr Yes
+call print
 

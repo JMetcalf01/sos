@@ -2,9 +2,10 @@
 #define SOS_INSTRUCTIONS_H
 
 #include <map>
-#include "../variablestack.h"
+#include "variablestack.h"
 #include "function/function.h"
 #include <iostream>
+#include "sosexception.h"
 
 namespace sos {
     class Instructions {
@@ -34,6 +35,10 @@ namespace sos {
         // goto LINE_NUMBER
         // Go to a defined position (it may be defined after the goto, and will be searched).
         static void go(std::map<std::string, std::string>* memory, VariableStack* stack, int* cursor, std::vector<std::string> params);
+
+        // if
+        // Requires a 1 or 0 to be on the stack. Will execute the line after if 1, or two lines after if 0.
+        static void ifelse(std::map<std::string, std::string>* memory, VariableStack* stack, int* cursor, std::vector<std::string> params);
     };
 }
 

@@ -5,11 +5,11 @@ sos::SourceFunction::SourceFunction(std::map<std::string, void (*)(std::map<std:
     m_instructions = instructions;
     m_name = name;
     m_params = params;
-    m_body = Util::subvector(lines, start, end);
+    m_body = new std::vector<std::string>(lines->begin() + start, lines->begin() + end);
 }
 
 sos::SourceFunction::~SourceFunction() {
-    delete[] m_body;
+    delete m_body;
 }
 
 void sos::SourceFunction::execute(sos::VariableStack *stack) {
@@ -18,7 +18,7 @@ void sos::SourceFunction::execute(sos::VariableStack *stack) {
         memory.insert(std::pair(param, stack->take()));
 
     for (int i = 0; i < m_body->size(); i++) {
-        std::vector<std::string> elements = Util::split(m_body[i], ' ');
+        std::vector<std::string> elements = Util::split(m_body->at(i), ' ');
         std::vector<std::string> params(elements.begin() + 1, elements.end());
         if (elements[0] == "exit")
             return;

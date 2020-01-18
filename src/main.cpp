@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
-#include "../variablestack.h"
+#include "variablestack.h"
 #include "function/sourcefunction.h"
 #include "function/nativefunction.h"
 #include "util.h"
@@ -32,9 +32,18 @@ int main() {
     instruction("loadr", Instructions::loadr);
     instruction("read", Instructions::read);
     instruction("goto", Instructions::go);
+    instruction("if", Instructions::ifelse);
 
     // Load Native Functions
     native("print", NativeFunction::print);
+    native("!", NativeFunction::invert);
+    native("&&", NativeFunction::boolAnd);
+    native("||", NativeFunction::boolOr);
+    native("==", NativeFunction::equals);
+    native(">", NativeFunction::greater);
+    native(">=", NativeFunction::greaterEqual);
+    native("<", NativeFunction::less);
+    native("<=", NativeFunction::lessEqual);
 
 
     std::vector<std::string> lines = readFile();
