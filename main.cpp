@@ -1,8 +1,18 @@
 #include <iostream>
+#include "variablestack.h"
 
-using namespace std;
+using namespace sos;
 
 int main() {
-    cout << "Hello, World!" << endl;
+    VariableStack stack;
+
+    stack.load("Hello, World");
+
+
+
+    std::cout << stack.take() << std::endl;
+
+    stack.take();
+
     return 0;
 }
