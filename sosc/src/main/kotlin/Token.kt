@@ -60,4 +60,10 @@ object Tokens {
     val EIGHT = Token("\u0038\uFE0F\u20E3")
     val NINE = Token("\u0039\uFE0F\u20E3")
     val INFINITY = Token("\u267E")
+
+
+    val POSSIBLE_TOKENS: MutableMap<String, Token> = mutableMapOf()
+    init {
+        POSSIBLE_TOKENS[" "] = SPACE
+    }
 }

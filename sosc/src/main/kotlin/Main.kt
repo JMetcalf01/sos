@@ -39,6 +39,7 @@ class Parser constructor(private val inputPath: String, private val outputPath: 
         val characters: MutableList<String> = regex.replace(file.replace("\n", " \\n "), " ").split(" ") as MutableList<String>
 
         val tokens = mutableListOf<Token>()
+        for ()
 
         testSyntax(tokens)
     }
