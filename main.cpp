@@ -11,6 +11,7 @@ using namespace sos;
 void testFunction();
 std::vector<std::string> readFile();
 void parseForFunction(std::vector<std::string> lines);
+std::vector<std::string> split(std::string str, char delimiter);
 
 
 /**
@@ -70,6 +71,18 @@ void parseForFunction(std::vector<std::string> lines)
         }
         i++;
     }
+}
+
+std::vector<std::string> split(std::string str, char delimiter) {
+    std::vector<std::string> elements;
+
+    size_t pos = 0;
+    while ((pos = str.find(delimiter)) != std::string::npos) {
+        elements.push_back(str.substr(0, pos));
+        str.erase(0, pos);
+    }
+
+    return elements;
 }
 
 void testFunction() {
