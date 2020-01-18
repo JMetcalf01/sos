@@ -6,9 +6,9 @@ std::vector<std::string> sos::Util::split(std::string str, char delimiter) {
     size_t pos = 0;
     while ((pos = str.find(delimiter)) != std::string::npos) {
         elements.push_back(str.substr(0, pos));
-        str.erase(0, pos);
+        str.erase(0, pos + 1);
     }
-
+    elements.push_back(str);
     return elements;
 }
 

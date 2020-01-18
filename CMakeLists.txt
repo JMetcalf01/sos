@@ -3,4 +3,4 @@ project(sos)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(sos main.cpp function.cpp function.h variablestack.cpp variablestack.h instructions.cpp util.cpp util.h)
+add_executable(sos main.cpp function.cpp function.h variablestack.cpp variablestack.h util.cpp util.h instructions.cpp instructions.h)
