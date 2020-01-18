@@ -9,11 +9,12 @@
 namespace sos {
     class Function {
     private:
-        std::string m_name;
         std::map<std::string, void (*) ()>* m_instructions;
+        std::string m_name;
+        std::vector<std::string> m_params;
         std::string *m_body;
     public:
-        Function(std::string &name, std::map<std::string, void (*) ()>* instructions, std::vector<std::string>& lines, int start, int end);
+        Function(std::map<std::string, void (*) ()>* instructions, std::string &name, std::vector<std::string> params, std::vector<std::string>& lines, int start, int end);
         ~Function();
 
         void execute(VariableStack* stack);

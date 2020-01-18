@@ -5,8 +5,7 @@ store VAR_NAME VALUE            Assign a name to a value. This may be used multi
 load VAR_NAME                   Load a variable by name to the "stack"
 loadr VALUE                     Load a raw value to the "stack"
 read VAR_NAME                   Reads a line of user input and assigns the value to the variable.
-pos ID                          Assign a position which can be moved to
-goto ID                         Go to a defined position (it may be defined after the goto, and will be searched).
+goto LINE_NUMBER                Go to a defined position (it may be defined after the goto, and will be searched).
 exit                            Return. The first value on the "stack" will be returned. There is an implicit return at the end of a function.
 
 # Hello World
@@ -16,36 +15,31 @@ call 🖨                 // Call function named 🖨
 
 # Hello World x10
 func 💯
-store 😂 0
-pos 0
-load 😂
-loadr 10
-<
-goto 1
-goto 2
-pos 1
-store 😋 Hello World
-load 😋
-call 🖨
-load 😂
-loadr 1
-+
-store 😂
-goto 0
-pos 2
+0  store 😂 0
+1  load 😂
+2  loadr 10
+3  <
+4  goto 6
+5  exit
+6  store 😋 Hello World
+7  load 😋
+8  call 🖨
+9  load 😂
+10 loadr 1
+11 +
+12 store 😂
+13 goto 1
 
 func ⬆ ❤ 💙
-load ❤
-load 💙
-<
-goto 0
-goto 1
-pos 0
-load 💙
-exit
-pos 1
-load ❤
-exit
+0 load ❤
+1 load 💙
+2 <
+3 goto 5
+4 goto 7
+5 load 💙
+6 exit
+7 load ❤
+8 exit
 
 
 
