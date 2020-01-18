@@ -19,6 +19,7 @@ std::map<std::string, void (*)(std::map<std::string, std::string> *, VariableSta
 
 //operation.insert(std::pair<std::string, void (*) ()>("This is a test", testFunction));
 int main() {
+
     std::vector<std::string> lines;
 
     std::cout << "Hello, World!" << std::endl;

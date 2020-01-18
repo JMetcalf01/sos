@@ -22,7 +22,9 @@ void sos::Function::execute(sos::VariableStack *stack) {
     for (int i = 0; i < m_body->size(); i++) {
         std::vector<std::string> elements = Util::split(m_body[i], ' ');
         std::string* params = Util::subvector(&elements, 1, elements.size());
-        m_instructions->find(elements[0])->second(&memory, stack, &i, params);
+        if (elements[0] == "exit")
+            return;
+        else m_instructions->find(elements[0])->second(&memory, stack, &i, params);
         delete[] params;
     }
 }
