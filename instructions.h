@@ -3,7 +3,7 @@
 
 #include <map>
 #include "variablestack.h"
-#include "function.h"
+#include "sosc/function.h"
 #include <iostream>
 
 namespace sos {
@@ -34,10 +34,6 @@ namespace sos {
         // goto LINE_NUMBER
         // Go to a defined position (it may be defined after the goto, and will be searched).
         static void go(std::map<std::string, std::string>* memory, VariableStack* stack, int* cursor, std::string* params);
-//
-//        // exit
-//        // Return. The first value on the "stack" will be returned. There is an implicit return at the end of a function.
-//        static void exit(std::map<std::string, std::string>* memory, VariableStack* stack, int* cursor, std::string* params);
     };
 }
 

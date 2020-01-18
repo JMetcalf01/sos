@@ -5,12 +5,12 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "variablestack.h"
+#include "../variablestack.h"
 
 namespace sos {
     class Function {
     public:
-        virtual void execute(VariableStack* stack){
+        virtual void execute(VariableStack* stack) {
             throw "UMMMM.....THAT WASN'T SUPOSE TO HAPPEN?!?!?!?!?!";
         }
     };
