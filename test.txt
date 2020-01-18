@@ -1,5 +1,4 @@
-func 💯 6
-loadr Hello, World
-call 🖨
+func main
+loadr Hello, Worldy world world fuck my butt. hard
+call print
 
-end
