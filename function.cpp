@@ -1,12 +1,12 @@
 #include "function.h"
-#include "util.cpp"
+#include "util.h"
 
 sos::Function::Function(std::map<std::string, void (*)(std::map<std::string, std::string>*, VariableStack*, int*, std::string*)> *instructions,
         std::string &name, std::vector<std::string> &params, std::vector<std::string> *lines, int start, int end) {
     m_instructions = instructions;
     m_name = name;
     m_params = params;
-    m_body = subvector(lines, start, end);
+    m_body = Util::subvector(lines, start, end);
 
 }
 
@@ -20,8 +20,8 @@ void sos::Function::execute(sos::VariableStack *stack) {
         memory.insert(std::pair(param, stack->take()));
 
     for (int i = 0; i < m_body->size(); i++) {
-        std::vector<std::string> elements = split(m_body[i], ' ');
-        std::string* params = subvector(&elements, 1, elements.size());
+        std::vector<std::string> elements = Util::split(m_body[i], ' ');
+        std::string* params = Util::subvector(&elements, 1, elements.size());
         m_instructions->find(elements[0])->second(&memory, stack, &i, params);
         delete[] params;
     }

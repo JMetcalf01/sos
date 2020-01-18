@@ -21,4 +21,16 @@ namespace sos {
     void store(std::map<std::string, std::string>* memory, VariableStack* stack, int* cursor, std::string* params) {
         memory->insert(std::pair(params[0], params[1]));
     }
+
+    //load VAR_NAME
+    // Load a variable by name to the "stack"
+    void load(std::map<std::string, std::string>* memory, VariableStack* stack, int* cursor, std::string* params) {
+
+    }
+
+    //loadr VALUE
+    // Load a raw value to the "stack"
+    void loadr(std::map<std::string, std::string>* memory, VariableStack* stack, int* cursor, std::string* params) {
+
+    }
 }
