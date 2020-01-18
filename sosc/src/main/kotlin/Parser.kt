@@ -73,7 +73,6 @@ class Parser constructor(private val tokens: List<Token>, private val outputPath
      * @author Jonathan Metcalf
      *
      * @param start starting index of the tokens to look through (inclusive)
-     * @param end ending index of the tokens to look through (exclusive)
      * @return the list of the params
      */
     private fun findParams(start: Int): List<String> {
