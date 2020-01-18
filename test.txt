@@ -1,0 +1,5 @@
+func 💯 6
+loadr Hello, World
+call 🖨
+
+end
