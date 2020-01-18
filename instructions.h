@@ -8,7 +8,7 @@
 namespace sos {
     class Instructions {
     public:
-        static std::map<std::string, Function> functions;
+        static std::map<std::string, Function*> functions;
 
         // call FUNC_NAME
         // Call a named function. The parameters must be loaded to the "stack" using `load` or `loadr` before call.

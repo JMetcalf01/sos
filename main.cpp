@@ -1,11 +1,10 @@
 #include <iostream>
 #include <fstream>
 #include <map>
-#include <string>
 #include "variablestack.h"
 #include "function.h"
 #include "util.h"
-//#include "instructions.cpp"
+#include "instructions.h"
 
 using namespace sos;
 
@@ -17,7 +16,6 @@ void parseForFunction(std::vector<std::string> lines);
  *  Makes a map of the functions (They are added by the file parser)
  */
 std::map<std::string, void (*)(std::map<std::string, std::string> *, VariableStack *, int *, std::string *)> instructions;
-std::map<std::string, Function> functions;
 
 //operation.insert(std::pair<std::string, void (*) ()>("This is a test", testFunction));
 int main() {
@@ -28,6 +26,10 @@ int main() {
     std::cout << "testing" << std::endl;
     std::cout << lines.at(0) << std::endl;
     parseForFunction(lines);
+
+    // Deallocate functions
+    for(auto & function : Instructions::functions)
+        delete function.second;
     return 0;
 }
 
@@ -45,7 +47,7 @@ void parseForFunction(std::vector<std::string> lines) {
         if (str.empty()) {
             std::vector<std::string> subParams(params.begin() + 1, params.end());
 
-            functions.insert(std::pair(params.at(1), Function(&instructions, params.at(1), subParams, &lines, startIndex, i+1)));
+            Instructions::functions.insert(std::pair(params.at(1), new Function(&instructions, params.at(1), subParams, &lines, startIndex, i+1)));
         }
         i++;
     }
@@ -55,7 +57,7 @@ std::vector<std::string>  readFile()
 {
     std::vector<std::string> linesImport;
 
-    std::ifstream file("C:\\Users\\Troy.Mullenberg\\Programing\\Workspaces\\GitHub clones\\Sos\\test.txt");
+    std::ifstream file("/Users/mattworzala/dev/cpp/sos/test.txt");
     std::string str;
     while (std::getline(file, str)) {
         std::cout << str << "\n";
