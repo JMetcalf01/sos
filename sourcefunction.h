@@ -1,7 +1,3 @@
-//
-// Created by Troy.Mullenberg on 1/18/2020.
-//
-
 #ifndef SOS_SOURCEFUNCTION_H
 #define SOS_SOURCEFUNCTION_H
 
@@ -10,6 +6,7 @@
 #include <vector>
 #include "variablestack.h"
 #include "function.h"
+#include "util.h"
 
 namespace  sos
 {
@@ -23,6 +20,8 @@ namespace  sos
             SourceFunction(std::map<std::string, void (*)(std::map<std::string, std::string> *, VariableStack *, int *, std::string*)> *instructions,
                      std::string &name, std::vector<std::string> &params, std::vector<std::string> *lines, int start, int end);
             ~SourceFunction();
+
+            void execute(VariableStack* stack) override;
     };
 }
 

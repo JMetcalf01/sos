@@ -42,8 +42,3 @@ void sos::Instructions::go(std::map<std::string, std::string> *memory, sos::Vari
                            std::string *params) {
     *cursor = std::stoi(params[0]) - 1;
 }
-
-void sos::Instructions::exit(std::map<std::string, std::string> *memory, sos::VariableStack *stack, int *cursor,
-                             std::string *params) {
-
-}
