@@ -2,7 +2,7 @@
 #include <fstream>
 #include <map>
 #include "variablestack.h"
-#include "sosc/sourcefunction.h"
+#include "function/sourcefunction.h"
 #include "util.h"
 #include "instructions.h"
 

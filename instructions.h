@@ -3,7 +3,7 @@
 
 #include <map>
 #include "variablestack.h"
-#include "sosc/function.h"
+#include "function/function.h"
 #include <iostream>
 
 namespace sos {
