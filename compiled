@@ -1,0 +1,51 @@
+# Commands
+func FUNC_NAME PARAM_NAME...    Start function definition. Function is ended by an empty line
+call FUNC_NAME                  Call a named function. The parameters must be loaded to the "stack" using `load` or `loadr` before call.
+store VAR_NAME VALUE            Assign a name to a value. This may be used multiple times to reassign.
+load VAR_NAME                   Load a variable by name to the "stack"
+loadr VALUE                     Load a raw value to the "stack"
+read VAR_NAME                   Reads a line of user input and assigns the value to the variable.
+pos ID                          Assign a position which can be moved to
+goto ID                         Go to a defined position (it may be defined after the goto, and will be searched).
+exit                            Return. The first value on the "stack" will be returned. There is an implicit return at the end of a function.
+
+# Hello World
+func 💯                 // Start function with name `main`
+loadr Hello, World      // Load raw value "Hello, World"
+call 🖨                 // Call function named 🖨
+
+# Hello World x10
+func 💯
+store 😂 0
+pos 0
+load 😂
+loadr 10
+<
+goto 1
+goto 2
+pos 1
+store 😋 Hello World
+load 😋
+call 🖨
+load 😂
+loadr 1
++
+store 😂
+goto 0
+pos 2
+
+func ⬆ ❤ 💙
+load ❤
+load 💙
+<
+goto 0
+goto 1
+pos 0
+load 💙
+exit
+pos 1
+load ❤
+exit
+
+
+
