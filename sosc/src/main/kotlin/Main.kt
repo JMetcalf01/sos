@@ -2,14 +2,14 @@ import java.io.*
 
 /**
  * The entry point into the program. The first argument should be
- * the file written in sos that they want compiled.
+ * the file written in 🆘 that they want compiled.
  *
  * @author Jonathan Metcalf
  *
  * @param args the arguments to the function
  */
 fun main(args: Array<String>) {
-    Parser(args[0], args[1]).parse()
+    Tokenizer(args[0], args[1]).run()
 }
 
 /**
@@ -20,10 +20,9 @@ fun main(args: Array<String>) {
  * @property inputPath the path of the file to be compiled
  * @property outputPath the path of the compiled file
  */
-class Parser constructor(private val inputPath: String, private val outputPath: String) {
+class Tokenizer constructor(private val inputPath: String, private val outputPath: String) {
 
     private val reader: BufferedReader = BufferedReader(FileReader(inputPath))
-    private val writer: BufferedWriter = BufferedWriter(FileWriter(outputPath))
     private val regex: Regex = Regex("[ ]+")
     private val tokens: MutableList<Token> = mutableListOf()
 
@@ -31,20 +30,23 @@ class Parser constructor(private val inputPath: String, private val outputPath: 
      * Parses through every line of the program to be compiled.
      *
      * @author Jonathan Metcalf and Martin Bleakley
-     *
      */
-    fun parse() {
+    fun run() {
         tokenize()
-        testSyntax()
+        Parser(tokens, outputPath).parse()
     }
 
+    /**
+     * Breaks up the file into a string of tokens to be parsed and checked for syntax.
+     *
+     * @author Jonathan Metcalf and Martin Bleakley
+     *
+     */
     private fun tokenize() {
         // Read file to string
         var file = ""
         reader.lines().forEach { file += "$it \\n " }
         file = regex.replace(file, " ")
-
-        println(file)
 
         // Tokenize it
         var i = 0
@@ -61,7 +63,6 @@ class Parser constructor(private val inputPath: String, private val outputPath: 
 
             // If it gets here, then it is an unknown variable and we need to detect it.
             val current = file.substring(i)
-
             for (x in 0..current.length) {
                 for (special in TokenType.values()) {
                     if (special.unicode != null && current.substring(x).startsWith(special.unicode)) {
@@ -73,16 +74,5 @@ class Parser constructor(private val inputPath: String, private val outputPath: 
                 }
             }
         }
-
-        println(tokens)
-    }
-
-
-    /**
-     * Tests the syntax of the string to confirm there are no errors.
-     * If there are, then throw up an error.
-     */
-    private fun testSyntax() {
-
     }
 }
