@@ -2,7 +2,7 @@
 #include <fstream>
 #include <map>
 #include "variablestack.h"
-#include "function.h"
+#include "sourcefunction.h"
 #include "util.h"
 #include "instructions.h"
 
@@ -24,8 +24,6 @@ int main() {
 
     std::cout << "Hello, World!" << std::endl;
     lines = readFile();
-    std::cout << "testing" << std::endl;
-    std::cout << lines.at(0) << std::endl;
     parseForFunction(lines);
 
     // Deallocate functions
@@ -43,12 +41,13 @@ void parseForFunction(std::vector<std::string> lines) {
 
         if (str.find("func") == 0) {
             startIndex = i;
+            std::cout << str << std::endl;
             params = Util::split(str, ' ');
         }
         if (str.empty()) {
             std::vector<std::string> subParams(params.begin() + 1, params.end());
 
-            Instructions::functions.insert(std::pair(params.at(1), new Function(&instructions, params.at(1), subParams, &lines, startIndex, i+1)));
+            Instructions::functions.insert(std::pair(params.at(1), new SourceFunction(&instructions, params.at(1), subParams, &lines, startIndex, i+1)));
         }
         i++;
     }
@@ -58,10 +57,9 @@ std::vector<std::string>  readFile()
 {
     std::vector<std::string> linesImport;
 
-    std::ifstream file("/Users/mattworzala/dev/cpp/sos/test.txt");
+    std::ifstream file("C:\\Users\\Troy.Mullenberg\\Programing\\Workspaces\\GitHub clones\\Sos\\test.txt");
     std::string str;
     while (std::getline(file, str)) {
-        std::cout << str << "\n";
         linesImport.push_back(str);
     }
     return linesImport;
