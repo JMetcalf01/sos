@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "../variablestack.h"
+#include "../../variablestack.h"
 
 namespace sos {
     class Function {

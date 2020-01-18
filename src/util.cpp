@@ -12,7 +12,7 @@ std::vector<std::string> sos::Util::split(std::string str, char delimiter) {
     return elements;
 }
 
-std::string *sos::Util::subvector(std::vector<std::string> *vec, int start, int end) {
+std::string* sos::Util::subvector(std::vector<std::string> *vec, int start, int end) {
     auto* sub = new std::string[end - start];
     for (int i = start; i < end; i++)
         sub[i - start] = vec->at(i);

@@ -6,7 +6,7 @@ void sos::VariableStack::load(std::string item) {
 
 std::string sos::VariableStack::take() {
     if (items.empty())
-        throw 101;
+        throw "CANNOT TAKE FROM EMPTY STACK";
     auto front = items.front();
     items.erase(items.begin());
     return front;
