@@ -4,9 +4,9 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "variablestack.h"
+#include "../variablestack.h"
 #include "function.h"
-#include "util.h"
+#include "../util.h"
 
 namespace  sos
 {
