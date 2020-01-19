@@ -7,7 +7,6 @@ enum class TokenType(val unicode: String?) {
     FUNC("\uD83D\uDCDD"),
     MAIN("\uD83D\uDCAF"),
     IF("\uD83E\uDD14"),
-    ELSEIF("\uD83E\uDD37\u200D\uD83E\uDD14"),
     ELSE("\uD83D\uDC49"),
     LEFT_PARENTHESES("\uD83C\uDF1C"),
     RIGHT_PARENTHESES("\uD83C\uDF1B"),
@@ -24,6 +23,7 @@ enum class TokenType(val unicode: String?) {
     BRACE("\uD83D\uDD36"),
     ERROR("\u2622"),
     EQUALS("\uD83C\uDF9E"),
+    COMPARE("\u2714"),
     IMPORT("\u27A1"),
     RETURN("\u2B05"),
     COMMENT("\uD83E\uDD56\uD83E\uDD56"),
@@ -38,6 +38,7 @@ enum class TokenType(val unicode: String?) {
     EIGHT("\u0038\uFE0F\u20E3"),
     NINE("\u0039\uFE0F\u20E3"),
     INFINITY("\u267E"),
+    AND("\u2194"),
     NEW_LINE("\\n"),
     SPACE(" "),
     UNKNOWN(null);

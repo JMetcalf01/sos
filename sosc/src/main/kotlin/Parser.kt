@@ -16,27 +16,28 @@ class Parser constructor(private val tokens: List<Token>, private val outputPath
     private val writer: BufferedWriter = BufferedWriter(FileWriter(File(outputPath)))
     private var text = ""
     private var index = 0
+    private var lineCount = 0
 
+    /**
+     *
+     *
+     */
     fun parse() {
-        println(tokens)
-
         while (index < tokens.size) {
-
             when (tokens[index].tokenType) {
                 TokenType.FUNC -> {
                     funcNameChecker()
                     funcBodyChecker()
                     text += "\n"
+                    lineCount++
                 }
-
             }
 
             index++
         }
 
         // Writes text to the file and closes
-        text += "\n"
-        writer.write(text)
+        writer.write(text + "\n")
         writer.close()
     }
 
@@ -55,12 +56,15 @@ class Parser constructor(private val tokens: List<Token>, private val outputPath
         index += 2
         if (tokens[index].tokenType == TokenType.MAIN) {
             text += "func main\n"
+            lineCount++
         } else {
             text += "func ${tokens[index].unicode}"
 
             // Does parameters
             index++
             findFuncParams()
+            text += "\n"
+            lineCount++
         }
 
         // Moves index to next line
@@ -101,12 +105,13 @@ class Parser constructor(private val tokens: List<Token>, private val outputPath
      * @author Jonathan Metcalf
      */
     private fun funcBodyChecker() {
-        val start = index
         when (tokens[index].tokenType) {
             TokenType.UNKNOWN -> {
+                val start = index
                 index++
                 findCalledParams()
                 text += "call ${tokens[start].unicode}\n"
+                lineCount++
             }
 
             TokenType.VAR -> {
@@ -114,15 +119,27 @@ class Parser constructor(private val tokens: List<Token>, private val outputPath
             }
 
             TokenType.IF -> {
-
-            }
-
-            TokenType.ELSE -> {
-
+                ifFunction()
             }
 
             TokenType.WHILE -> {
 
+            }
+
+            TokenType.RETURN -> {
+                index += 2
+                if (tokens[index].tokenType == TokenType.UNKNOWN) {
+                    text += "load ${tokens[index].unicode}\n"
+                    lineCount++
+                } else if (tokens[index].tokenType == TokenType.QUOTE_MARK) {
+                    text += "loadr "
+                    getString()
+                    text += "\n"
+                    lineCount++
+                }
+
+                text += "exit\n"
+                lineCount++
             }
         }
     }
@@ -147,13 +164,18 @@ class Parser constructor(private val tokens: List<Token>, private val outputPath
         index++
     }
 
-    //find all params, figure out if variable or literal (loadr if literal, load if variable)
+    /**
+     * Find the parameters of a function that is being called.
+     *
+     * @author Jonathan Metcalf and Troy Mullenberg
+     *
+     */
     private fun findCalledParams() {
         while (tokens[index].tokenType != TokenType.RIGHT_PARENTHESES) {
             // If it's unknown, it's a parameter to add
             if (tokens[index].tokenType == TokenType.UNKNOWN) {
                 text += "load ${tokens[index].unicode}\n"
-
+                lineCount++
             }
 
             // Finding string
@@ -162,6 +184,7 @@ class Parser constructor(private val tokens: List<Token>, private val outputPath
                 text += "loadr "
                 getString()
                 text += "\n"
+                lineCount++
             }
 
             // Parentheses are incorrect if this is true
@@ -172,6 +195,12 @@ class Parser constructor(private val tokens: List<Token>, private val outputPath
         }
     }
 
+    /**
+     * Stores a variable name.
+     *
+     * @author Jonathan Metcalf and Troy Mullenberg
+     *
+     */
     private fun storeVariable() {
         index++
         if (tokens[index].tokenType != TokenType.SPACE)
@@ -183,6 +212,12 @@ class Parser constructor(private val tokens: List<Token>, private val outputPath
         findValue()
     }
 
+    /**
+     * Finds the value of a specific string or number, converting it from emoji into text.
+     *
+     * @author Jonathan Metcalf and Troy Mullenberg
+     *
+     */
     private fun findValue() {
         while (tokens[index].tokenType == TokenType.SPACE) {
             index++
@@ -207,8 +242,17 @@ class Parser constructor(private val tokens: List<Token>, private val outputPath
         }
 
         text += "\n"
+        lineCount++
     }
 
+    /**
+     * Returns the string representation of each number emoji.
+     *
+     * @author Jonathan Metcalf
+     *
+     * @param token the token to be converted
+     * @return the string representation
+     */
     private fun getStringNumber(token: Token): String {
         return when (token.tokenType) {
             TokenType.ONE -> "1"
@@ -223,5 +267,88 @@ class Parser constructor(private val tokens: List<Token>, private val outputPath
             TokenType.ZERO -> "0"
             else -> throw IllegalStateException("getStringNumber called on non-number!")
         }
+    }
+
+    /**
+     * Parses a bool used in an if statement
+     * (like (2<3)
+     */
+    private fun parseBool() {
+        val load1: Token = tokens[index]
+        index++
+        val call: Token = tokens[index]
+        index++
+        val load2: Token = tokens[index]
+        index++
+
+        if (load1.tokenType == TokenType.UNKNOWN) {
+            text += "load ${load1.unicode}\n"
+            lineCount++
+        } else {
+            text += "loadr ${load1.unicode}\n"
+            lineCount++
+        }
+
+        if (load2.tokenType == TokenType.UNKNOWN) {
+            text += "load ${load2.unicode}\n"
+            lineCount++
+        } else {
+            text += "loadr ${load2.unicode}\n"
+            lineCount++
+        }
+
+        text += "call ${call.unicode}\n"
+        lineCount++
+    }
+
+    /**
+     * Deals with if statements.
+     *
+     * @author Jonathan Metcalf and Troy Mullenberg
+     *
+     */
+    private fun ifFunction() {
+        index++
+        while (tokens[index].tokenType == TokenType.SPACE) {
+            index++
+        }
+        index++
+        parseBool()
+        text += "if\n"
+        lineCount++
+
+        // using a different string, print false route with new lines, and also give us how many lines that is
+
+        var elseIndex = index
+        while (tokens[elseIndex].tokenType != TokenType.ELSE) {
+            elseIndex++
+        }
+        while (tokens[elseIndex].tokenType != TokenType.NEW_LINE) {
+            elseIndex++
+        }
+        index++
+
+        val tempIndex = index
+        val lines = translateFalse()
+        text += "goto ${(lineCount + lines + 2)}"
+        // add lines to linecount for real
+        // Actually print false
+
+        // back to printing the true route with new lines, keeping linecount accurate
+
+
+    }
+
+    private fun translateFalse(): Int {
+        var falseIndex = index
+        var lines = 0
+        while (tokens[falseIndex].tokenType != TokenType.BRACE) {
+           if (tokens[falseIndex].tokenType == TokenType.NEW_LINE) lines++
+
+            funcBodyChecker()
+
+            falseIndex++
+        }
+        return lines
     }
 }
