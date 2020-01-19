@@ -33,7 +33,7 @@ class Tokenizer constructor(private val inputPath: String, private val outputPat
      */
     fun run() {
         tokenize()
-        Parser(tokens, outputPath).parse()
+        OldParser(tokens, outputPath).parse()
     }
 
     /**
