@@ -1,10 +1,10 @@
-# sos -> A New Generation for code!
+# .🆘🥐 -> A New Generation for code!
 A programming language made up of emojis.
 
 ## Structure
-Kotlin Interperter
+Kotlin Interperter (.🆘)
 
-C++ Interperter / Schedualer
+C++ Interperter / Schedualer (.🆘🥐)
 
 ## syntax
 | Emoji Keyword  | Other language equivalent |
@@ -47,8 +47,8 @@ C++ Interperter / Schedualer
 |♾|infinity|
 
 
-##Code Exampels 
-###Hello World:
+## Code Exampels 
+### Hello World:
 ```
 📝 💯 🔶
     🖨🌜🔤Hello World! 🔤🌛
@@ -65,7 +65,7 @@ C++ Interperter / Schedualer
     🔶
 🔶
 ```
-###User Defined function (Returns larger Parameter)
+### User Defined function (Returns larger Parameter)
 ~~~
 📝 ⬆ 🌜❤ 💙🌛🔶
     🤔 🌜❤◀💙🌛 🔶
@@ -76,7 +76,7 @@ C++ Interperter / Schedualer
 🔶
 ~~~
 
-##Running Files 
+## Running Files 
 Curently there is no set way to navigate the full pipeline therefore to run you .🆘 code you will need to 
 have both Kotlin and C++ compilers on your device and your respective IDE of choice.
 
