@@ -2,9 +2,9 @@
 A programming language made up of emojis.
 
 ## Structure
-Kotlin Interperter (.🆘)
+Kotlin Interpreter (.🆘)
 
-C++ Interperter / Schedualer (.🆘🥐)
+C++ Interpreter / Scheduler (.🆘🥐)
 
 ## syntax
 | Emoji Keyword  | Other language equivalent |
