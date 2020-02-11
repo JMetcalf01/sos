@@ -10,7 +10,7 @@ C++ Interpreter / Scheduler (.🆘🥐)
 | Emoji Keyword  | Other language equivalent |
 | ------------- | ------------- |
 | 📝    | function  |
-| 💯 📝		  | main function  |
+| 📝 💯		  | main function  |
 |🤔 |if|
 |🤷‍🤔 |else if|
 |👉|else|
