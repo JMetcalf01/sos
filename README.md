@@ -6,7 +6,7 @@ Kotlin Interpreter (.🆘)
 
 C++ Interpreter / Scheduler (.🆘🥐)
 
-## syntax
+## Syntax
 | Emoji Keyword  | Other language equivalent |
 | ------------- | ------------- |
 | 📝    | function  |
@@ -47,7 +47,7 @@ C++ Interpreter / Scheduler (.🆘🥐)
 |♾|infinity|
 
 
-## Code Exampels 
+## Code Examples 
 ### Hello World:
 ```
 📝 💯 🔶
@@ -65,7 +65,7 @@ C++ Interpreter / Scheduler (.🆘🥐)
     🔶
 🔶
 ```
-### User Defined function (Returns larger Parameter)
+### User Defined Function (Returns larger parameter)
 ~~~
 📝 ⬆ 🌜❤ 💙🌛🔶
     🤔 🌜❤◀💙🌛 🔶
@@ -77,7 +77,7 @@ C++ Interpreter / Scheduler (.🆘🥐)
 ~~~
 
 ## Running Files 
-Curently there is no set way to navigate the full pipeline therefore to run you .🆘 code you will need to 
+Curently, there is no set way to navigate the full pipeline; therefore, to run your .🆘 code, you will need to 
 have both Kotlin and C++ compilers on your device and your respective IDE of choice.
 
-Therefore we suggest writing your code in .🆘 because it is obviously superior
+Because of this, we suggest writing your code in .🆘 as it is obviously superior.
