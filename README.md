@@ -25,7 +25,7 @@ C++ Interpreter / Scheduler (.🆘🥐)
 |⏭		|continue|
 |🔤|		quotes for string|
 |💲		|variable name|
-|✔🤷‍ 		|==|
+|✔ 		|==|
 |.🆘|file extension|
 |🔶		| brackets (open and close)|
 |☢		|error|
