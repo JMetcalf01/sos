@@ -1,0 +1,5 @@
+func main
+loadr  World! 
+call 🖨
+
+

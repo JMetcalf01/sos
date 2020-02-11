@@ -16,7 +16,7 @@ enum class TokenType(val unicode: String?) {
     MULTIPLY("\u2716"),
     DIVIDE("\u2797"),
     LESS_THAN("\u25C0"),
-    MORE_THAN("\u25B6"),
+    GREATER_THAN("\u25B6"),
     CONTINUE("\u23ED"),
     QUOTE_MARK("\uD83D\uDD24"),
     VAR("\uD83D\uDCB2"),
@@ -27,21 +27,23 @@ enum class TokenType(val unicode: String?) {
     IMPORT("\u27A1"),
     RETURN("\u2B05"),
     COMMENT("\uD83E\uDD56\uD83E\uDD56"),
-    ZERO("\u0030\uFE0F\u20E3"),
-    ONE("\u0031\uFE0F\u20E3"),
-    TWO("\u0032\uFE0F\u20E3"),
-    THREE("\u0033\uFE0F\u20E3"),
-    FOUR("\u0034\uFE0F\u20E3"),
-    FIVE("\u0035\uFE0F\u20E3"),
-    SIX("\u0036\uFE0F\u20E3"),
-    SEVEN("\u0037\uFE0F\u20E3"),
-    EIGHT("\u0038\uFE0F\u20E3"),
-    NINE("\u0039\uFE0F\u20E3"),
+    ZERO("0"),
+    ONE("1"),
+    TWO("2"),
+    THREE("3"),
+    FOUR("4"),
+    FIVE("5"),
+    SIX("6"),
+    SEVEN("7"),
+    EIGHT("8"),
+    NINE("9"),
+    PERIOD("."),
     INFINITY("\u267E"),
     AND("\u2194"),
     NEW_LINE("\\n"),
     SPACE(" "),
-    UNKNOWN(null);
+    UNKNOWN(null),
+    RAW("[a-zA-Z0-9]+");
 }
 
 /**
@@ -49,11 +51,10 @@ enum class TokenType(val unicode: String?) {
  *
  * @author Jonathan Metcalf
  *
- * @property tokenType the type of the token
- * @property unicode the unicode representation of the token
+ * @property type the type of the token
  */
-class Token(val tokenType: TokenType, val unicode: String) {
+class Token(val type: TokenType, private val raw: String? = null) {
     override fun toString(): String {
-        return if (tokenType == TokenType.UNKNOWN) unicode else tokenType.name
+        return if (type == TokenType.UNKNOWN || type == TokenType.RAW) raw!! else type.unicode!!
     }
 }

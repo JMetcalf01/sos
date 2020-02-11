@@ -15,7 +15,7 @@ fun main(args: Array<String>) {
 /**
  * Parses a sos file and compiles it.
  *
- * @author Jonathan Metcalf and Martin Bleakley
+ * @author Jonathan Metcalf
  *
  * @property inputPath the path of the file to be compiled
  * @property outputPath the path of the compiled file
@@ -29,17 +29,17 @@ class Tokenizer constructor(private val inputPath: String, private val outputPat
     /**
      * Parses through every line of the program to be compiled.
      *
-     * @author Jonathan Metcalf and Martin Bleakley
+     * @author Jonathan Metcalf
      */
     fun run() {
         tokenize()
-        OldParser(tokens, outputPath).parse()
+        println(Parser(tokens, outputPath).parse())
     }
 
     /**
      * Breaks up the file into a string of tokens to be parsed and checked for syntax.
      *
-     * @author Jonathan Metcalf and Martin Bleakley
+     * @author Jonathan Metcalf
      *
      */
     private fun tokenize() {
