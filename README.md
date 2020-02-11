@@ -10,7 +10,7 @@ C++ Interpreter / Scheduler (.🆘🥐)
 | Emoji Keyword  | Other language equivalent |
 | ------------- | ------------- |
 | 📝    | function  |
-| 💯 📝		  | main function  |
+| 📝 💯		  | main function  |
 |🤔 |if|
 |🤷‍🤔 |else if|
 |👉|else|
@@ -25,7 +25,7 @@ C++ Interpreter / Scheduler (.🆘🥐)
 |⏭		|continue|
 |🔤|		quotes for string|
 |💲		|variable name|
-|✔🤷‍ 		|==|
+|✔ 		|==|
 |.🆘|file extension|
 |🔶		| brackets (open and close)|
 |☢		|error|
@@ -34,16 +34,7 @@ C++ Interpreter / Scheduler (.🆘🥐)
 |⬅ |return|
 |🖨🌜🔤String 🔤🌛 |print function|
 |🥖 🥖 		|comment|
-| 0️|		0|
-| 1️⃣		|1|
-| 2️⃣	|	2||
-| 3️⃣	|	3|
-| 4️⃣	|	4|
-| 5️⃣	|	5|
-| 6️⃣	|	6|
-| 7️⃣	|	7|
-| 8️⃣	|	8|
-| 9️⃣	|	9|
+| 0️-9|0-9|
 |♾|infinity|
 
 
