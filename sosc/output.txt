@@ -1,5 +1,5 @@
-func main
-loadr  World! 
-call 🖨
-
+while
+loadr 2
+loadr 0
+call >
 
