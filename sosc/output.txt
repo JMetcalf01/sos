@@ -1,6 +1,14 @@
 func main 
 loadr Hello World!
 call 🖨
+loadr Hello World!
+call 🖨
+
+
+
+func ⬆ ❤ 💙
+loadr Test
+call 🖨
 
 
 

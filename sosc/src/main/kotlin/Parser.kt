@@ -19,15 +19,16 @@ class Parser {
      */
     fun parseFile(list: List<Token>): String? {
         // Advance to the first function
-        val index = advanceNextToken(list, 0, TokenType.FUNCTION)
+        var index = advanceNextToken(list, 0, TokenType.FUNCTION)
         if (index == -1) throw Exception("Compile failed!")
 
+        // Try to find the second function
+        index = advanceNextToken(list, index + 1, TokenType.FUNCTION)
         // If it's only one function, just return the statement
-        val next = advanceNextToken(list, index, TokenType.FUNCTION)
-        if (next == 0) return "${parseFunction(list.subList(0, list.size))}"
+        if (index == -1) return "${parseFunction(list.subList(0, list.size))}"
 
         // Otherwise recursively parse all of the statements
-        return "${parseFunction(list.subList(0, list.size))}\n${parseFile(list.subList(index + 1, list.size))}"
+        return "${parseFunction(list.subList(0, index))}\n${parseFile(list.subList(index, list.size))}"
     }
 
     /**
@@ -57,7 +58,7 @@ class Parser {
         }
 
         // Gets body
-        val body = parseBody(list) ?: return null
+        val body = parseBody(list.subList(advanceNextToken(list, index, TokenType.NEW_LINE) + 1, advanceToLastToken(list, TokenType.BRACE))) ?: return null
         return "func $name $params\n$body\n"
     }
 
@@ -97,12 +98,9 @@ class Parser {
      * @return the machine code representation of the body
      */
     private fun parseBody(list: List<Token>): String? {
-        // If the list has multiple values, recursively check each whether it's a value
-        val index = advanceNextToken(list, 0, TokenType.NEW_LINE)
-        if (index == -1) return null
-
         // If it's only one statement, just return the statement
-        if (index == list.size - 1) return "${parseStatement(list.subList(0, index - 1))}\n"
+        val index = advanceNextToken(list, 0, TokenType.NEW_LINE)
+        if (index == -1 || index == list.size - 1) return "${parseStatement(list.subList(0, index - 1))}\n"
 
         // Otherwise recursively parse all of the statements
         return "${parseStatement(list.subList(0, index - 1))}${parseBody(list.subList(index + 1, list.size))}"
@@ -375,6 +373,8 @@ class Parser {
      * CONTINUE -> ⏭
      *
      * TODO ACTUALLY MAKE THIS WORK
+     *
+     * @author Jonathan Metcalf
      *
      * @param list the list of tokens
      * @return the machine code representation of continue
