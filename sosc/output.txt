@@ -4,11 +4,7 @@ call 🖨
 loadr Hello World!
 call 🖨
 
-
-
 func ⬆ ❤ 💙
 loadr Test
 call 🖨
-
-
 
