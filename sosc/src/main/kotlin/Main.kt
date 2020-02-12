@@ -18,13 +18,14 @@ fun main(args: Array<String>) {
  * @author Jonathan Metcalf
  *
  * @property inputPath the path of the file to be compiled
- * @property outputPath the path of the compiled file
+ * @property outputPath the path to write the compiled 🆘🥐 code to
  */
 class Tokenizer constructor(private val inputPath: String, private val outputPath: String) {
 
     private val reader: BufferedReader = BufferedReader(FileReader(inputPath))
     private val regex: Regex = Regex("[ ]+")
     private val tokens: MutableList<Token> = mutableListOf()
+    private val writer = BufferedWriter(FileWriter(outputPath))
 
     /**
      * Parses through every line of the program to be compiled.
@@ -33,7 +34,8 @@ class Tokenizer constructor(private val inputPath: String, private val outputPat
      */
     fun run() {
         tokenize()
-        Parser(outputPath).parse(tokens)
+        writer.write("${Parser().parseFile(tokens)}\n")
+        writer.close()
     }
 
     /**

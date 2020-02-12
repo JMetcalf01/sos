@@ -1,3 +1,5 @@
+FILE -> [FUNCTION\n\n]+
+
 FUNCTION -> 📝 NAME FUNC_PARAMS 🔶 BODY 🔶
 
 FUNC_PARAMS -> EMPTY | NAME | NAME FUNC_PARAMS
@@ -27,7 +29,7 @@ NAME -> [❔ (non-keyword)]+
 
 DECLARE -> 💲 SET
 
-SET -> NAME 🎞 VALUE
+SET -> NAME 🎞 EXPRESSION
 
 RETURN -> ➡ VALUE
 

@@ -1,5 +1,6 @@
-while
-loadr 2
-loadr 0
-call >
+loadr Matt
+loadr Matty
+call 🖨
+loadr 3
+store 💦
 

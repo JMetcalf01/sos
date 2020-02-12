@@ -1,3 +1,5 @@
 .idea
 .gradle
 cmake-build-debug
+sosc/test.txt
+sosc/output.txt
