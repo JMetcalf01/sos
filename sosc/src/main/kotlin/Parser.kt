@@ -10,13 +10,24 @@ class Parser {
      * Parses the list of tokens of the file and prints the machine code
      * into the output file.
      *
+     * Parses a file based on the following rule:
+     * FILE -> [FUNCTION[\n]+]+
+     *
      * @author Jonathan Metcalf
      *
      * @param list the list to parse
      */
     fun parseFile(list: List<Token>): String? {
-        // todo make parse any number of functions
-        return parseFunction(list.subList(0, list.size))
+        // Advance to the first function
+        val index = advanceNextToken(list, 0, TokenType.FUNCTION)
+        if (index == -1) throw Exception("Compile failed!")
+
+        // If it's only one function, just return the statement
+        val next = advanceNextToken(list, index, TokenType.FUNCTION)
+        if (next == 0) return "${parseFunction(list.subList(0, list.size))}"
+
+        // Otherwise recursively parse all of the statements
+        return "${parseFunction(list.subList(0, list.size))}\n${parseFile(list.subList(index + 1, list.size))}"
     }
 
     /**
@@ -29,8 +40,52 @@ class Parser {
      * @return the machine code representation of the function
      */
     private fun parseFunction(list: List<Token>): String? {
-        // todo include parsing function name etc.
-        return parseBody(list)
+        if (list[0].type != TokenType.FUNCTION) return null
+
+        // Gets the name of the function
+        var index = advanceNextToken(list, 2, TokenType.SPACE)
+        val name = if (list[2].type == TokenType.MAIN) "main" else parseName(list.subList(2, index))
+        index++
+
+        // Gets parameters (if it's not the main function)
+        var params = ""
+        if (name != "main") {
+            index = advanceNextToken(list, index, TokenType.LEFT_PARENTHESES)
+            val end = advanceNextToken(list, index, TokenType.RIGHT_PARENTHESES)
+            val test = parseFuncParams(list.subList(index + 1, end))
+            if (test != null) params = test
+        }
+
+        // Gets body
+        val body = parseBody(list) ?: return null
+
+        return "func $name $params\n$body\n"
+    }
+
+    /**
+     * Parses a function parameters based on the following rule:
+     * FUNC_PARAMS -> EMPTY | NAME | NAME FUNC_PARAMS
+     *
+     * @author Jonathan Metcalf
+     *
+     * @param list the list of tokens
+     * @return the machine code representation of the parameters
+     */
+    private fun parseFuncParams(list: List<Token>): String? {
+        // If it's empty, there are no parameters
+        if (list.isEmpty()) return ""
+
+        // Check to make sure all the tokens are valid
+        var index = 0
+        for (token in list) {
+            var next = advanceNextToken(list, index, TokenType.SPACE)
+            if (next == -1) next = list.size
+            if (token.type != TokenType.SPACE && parseName(list.subList(index, next)) == null) return null
+            else index = next + 1
+            if (next >= list.size) break
+        }
+
+        return list.joinToString("")
     }
 
     /**
@@ -135,7 +190,7 @@ class Parser {
 
         val body = parseBody(list.subList(index, advanceToLastToken(list, TokenType.BRACE))) ?: return null
 
-        // todo fix this to actually be the machine code representation
+        // todo fix this to actually be the machine code representation using goto
         return "while\n$expression$body"
     }
 
@@ -266,6 +321,7 @@ class Parser {
 
         if (left == null || operator == null || right == null) return null
 
+
         return "${left}${right}call ${operator}\n"
     }
 
@@ -306,7 +362,9 @@ class Parser {
 
         // If the list from 2-onwards can successfully be parsed into a value, it is valid
         val value = parseValue(list.subList(2, list.nextIndexOf(2, TokenType.SPACE, TokenType.NEW_LINE)))
-        if (value != null) return "${value}exit\n"
+        if (value != null) {
+            return "${value}exit\n"
+        }
 
         // Otherwise, it isn't valid
         return null
@@ -351,7 +409,14 @@ class Parser {
      * @return the string representation of the name
      */
     private fun parseName(list: List<Token>): String? {
+        // todo fix random actual strings from counting!
         if (list.isEmpty()) return null
+
+        for (token in list) {
+            if (token.type == TokenType.RAW) {
+                throw Exception("Name shouldn't be a ")
+            }
+        }
 
         for (token in list) {
             // If there are spaces, it is not valid
@@ -359,7 +424,7 @@ class Parser {
             // If there are keywords, it is not valid
             if (TokenType.values().contains(token.type) && token.type != TokenType.UNKNOWN) return null
             // If there is a literal, it is not valid
-            if (token.type != TokenType.UNKNOWN && token.type.unicode!!.matches(Regex(TokenType.RAW.unicode!!))) return null
+            if (token.type == TokenType.UNKNOWN && token.raw!!.matches(Regex(TokenType.RAW.unicode!!))) return null
         }
         return list.joinToString("")
     }
@@ -408,7 +473,7 @@ class Parser {
     private fun advanceNextToken(list: List<Token>, start: Int = 0, vararg types: TokenType): Int {
         var index = start
         while (!types.contains(list[index].type)) {
-            if (index == list.size - 1) throw IllegalStateException()
+            if (index == list.size - 1) return -1
             index++
         }
         return index

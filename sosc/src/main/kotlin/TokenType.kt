@@ -4,7 +4,7 @@
  * @author Jonathan Metcalf
  */
 enum class TokenType(val unicode: String?) {
-    FUNC("\uD83D\uDCDD"),
+    FUNCTION("\uD83D\uDCDD"),
     MAIN("\uD83D\uDCAF"),
     IF("\uD83E\uDD14"),
     ELSE("\uD83D\uDC49"),
@@ -53,7 +53,7 @@ enum class TokenType(val unicode: String?) {
  *
  * @property type the type of the token
  */
-class Token(val type: TokenType, private val raw: String? = null) {
+class Token(val type: TokenType, val raw: String? = null) {
     override fun toString(): String {
         return if (type == TokenType.UNKNOWN || type == TokenType.RAW) raw!! else type.unicode!!
     }

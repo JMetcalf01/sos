@@ -1,6 +1,5 @@
-loadr Matt
-loadr Matty
+func ⬆ 💓💞 💘💘 💘 💘
+nullloadr Hello World! 
 call 🖨
-loadr 3
-store 💦
+null
 
