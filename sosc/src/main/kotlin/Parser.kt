@@ -58,7 +58,6 @@ class Parser {
 
         // Gets body
         val body = parseBody(list) ?: return null
-
         return "func $name $params\n$body\n"
     }
 
@@ -103,7 +102,7 @@ class Parser {
         if (index == -1) return null
 
         // If it's only one statement, just return the statement
-        if (index == list.size - 1) return "${parseStatement(list.subList(0, index - 1))}"
+        if (index == list.size - 1) return "${parseStatement(list.subList(0, index - 1))}\n"
 
         // Otherwise recursively parse all of the statements
         return "${parseStatement(list.subList(0, index - 1))}${parseBody(list.subList(index + 1, list.size))}"
@@ -140,7 +139,7 @@ class Parser {
         val continues = parseContinue(list)
         if (continues != null) return continues
 
-        return null
+        return ""
     }
 
     /**
@@ -215,7 +214,8 @@ class Parser {
         index = advanceSpaceTo(list, index, TokenType.LEFT_PARENTHESES)
         if (index == -1) return null
 
-        val params = parseCallParams(list.subList(index + 1, list.size - 1)) ?: return null
+        var params = parseCallParams(list.subList(index + 1, list.size - 1))
+        if (params == null) params = ""
 
         return "${params}call $name\n"
     }

@@ -1,5 +1,6 @@
-func ⬆ 💓💞 💘💘 💘 💘
-nullloadr Hello World! 
+func main 
+loadr Hello World!
 call 🖨
-null
+
+
 
