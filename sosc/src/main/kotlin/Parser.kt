@@ -150,7 +150,7 @@ class Parser {
      * @return the machine code representation of the if statement
      */
     private fun parseIf(list: List<Token>): String? {
-        // TODO
+        // todo if statement
         return null
     }
 
@@ -187,7 +187,7 @@ class Parser {
 
         val body = parseBody(list.subList(index, advanceToLastToken(list, TokenType.BRACE))) ?: return null
 
-        // todo fix this to actually be the machine code representation using goto
+        // todo fix while loop to actually be the machine code representation using goto
         return "while\n$expression$body"
     }
 
@@ -372,14 +372,13 @@ class Parser {
      * Parses a continue by the following rule:
      * CONTINUE -> ⏭
      *
-     * TODO ACTUALLY MAKE THIS WORK
-     *
      * @author Jonathan Metcalf
      *
      * @param list the list of tokens
      * @return the machine code representation of continue
      */
     private fun parseContinue(list: List<Token>): String? {
+        // todo actually make this work
         return if (list.size == 1 && list[0].type == TokenType.CONTINUE) "continue\n"
         else null
     }
