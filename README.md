@@ -2,7 +2,7 @@
 A programming language made up of emojis.
 
 ## Structure
-Kotlin Interpreter (.🆘)
+Kotlin Compiler (.🆘)
 
 C++ Interpreter / Scheduler (.🆘🥐)
 
