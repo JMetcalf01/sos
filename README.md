@@ -41,7 +41,7 @@ C++ Interpreter / Scheduler (.🆘🥐)
 ## Code Examples 
 ### Hello World:
 ```
-📝 💯  🔶
+📝 💯 🌜🌛 🔶
     🖨🌜🔤Hello World!🔤🌛
 🔶
 ```
