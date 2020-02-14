@@ -20,6 +20,12 @@ class Parser {
     fun parseFile(list: MutableList<Token>): String? {
         // Does some cleaning up before it parses it
         val remove = mutableListOf<Token>()
+
+        // Removes all new lines at the beginning
+        while (list[0].type == TokenType.NEW_LINE || list[0].type == TokenType.SPACE) {
+            list.removeAt(0)
+        }
+
         for (i in 0..list.size - 2) {
             // Removes spaces before new lines or other spaces
             if (list[i].type == TokenType.SPACE && (list[i + 1].type == TokenType.NEW_LINE || list[i + 1].type == TokenType.SPACE))
@@ -32,13 +38,12 @@ class Parser {
                 remove.add(list[i])
         }
         // Removes extra new line at the end
-//        if (list[list.size - 1].type == TokenType.NEW_LINE) list.removeAt(list.size - 1)
-
+        if (list[list.size - 1].type == TokenType.NEW_LINE) list.removeAt(list.size - 1)
         list.removeAll(remove)
 
         // Advance to the first function
         var index = list.advanceToNext(TokenType.FUNCTION)
-        if (index == -1) throw Exception("Compile failed!")
+        if (index == -1) return null
 
         // Try to find the second function
         index = list.advanceToNext(TokenType.FUNCTION, start = index + 1)
@@ -191,17 +196,17 @@ class Parser {
         if (list.isEmpty()) return null
 
         /*
-        func main
-        loadr 0
-        loadr 1
-        call >
-        if
-        goto 8
-        loadr No
-        call print
-        exit
-        loadr Yes
-        call print
+         func main
+        0 loadr 0
+        1 loadr 1
+        2 call >
+        3 if
+        4 goto 8
+        5 loadr No
+        8 call print
+        7 exit
+        8 loadr Yes
+        9 call print
         */
 
         // todo if statement
@@ -576,7 +581,7 @@ private fun List<Token>.advanceToLast(type: TokenType): Int {
  *
  * @param start the starting index to look at
  * @param matches the TokenTypes to look for
- * @return the index of the first matching token from that point onwards, or -1 if not found
+ * @return the index of the first matching token from that point onwards, or the next index if not found
  *
  * @see TokenType
  * @see List
