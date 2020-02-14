@@ -17,7 +17,24 @@ class Parser {
      *
      * @param list the list to parse
      */
-    fun parseFile(list: List<Token>): String? {
+    fun parseFile(list: MutableList<Token>): String? {
+        // Does some cleaning up before it parses it
+        val remove = mutableListOf<Token>()
+        for (i in 0..list.size - 2) {
+            // Removes spaces before new lines or other spaces
+            if (list[i].type == TokenType.SPACE && (list[i + 1].type == TokenType.NEW_LINE || list[i + 1].type == TokenType.SPACE))
+                remove.add(list[i])
+            // Removes excess new lines (if there are two or more in a row)
+            if (list[i].type == TokenType.NEW_LINE && list[i + 1].type == TokenType.NEW_LINE)
+                remove.add(list[i])
+            // Removes new lines before braces, except if it's the end of a statement
+            if (i != 0 && list[i - 1].type != TokenType.SPACE && list[i].type == TokenType.NEW_LINE && list[i + 1].type == TokenType.BRACE)
+                remove.add(list[i])
+        }
+        // Removes extra new line at the end
+        if (list[list.size - 1].type == TokenType.NEW_LINE) list.removeAt(list.size - 1)
+
+        list.removeAll(remove)
 
         // Advance to the first function
         var index = advanceNextToken(list, 0, TokenType.FUNCTION)
@@ -46,6 +63,7 @@ class Parser {
 
         // Gets the name of the function
         var index = advanceNextToken(list, 2, TokenType.SPACE)
+        // Todo check if main below should be the 100 or just "main"
         val name = if (list[2].type == TokenType.MAIN) "main" else parseName(list.subList(2, index))
         index++
 
@@ -66,7 +84,7 @@ class Parser {
         // Gets body
         val body = parseBody(
             list.subList(
-                advanceNextToken(list, index, TokenType.UNKNOWN),
+                advanceNextToken(list, advanceNextToken(list, index, TokenType.BRACE), TokenType.NEW_LINE) + 1,
                 advanceToLastToken(list, TokenType.BRACE)
             )
         ) ?: return null
@@ -127,6 +145,8 @@ class Parser {
      * @return the machine code representation of the statement
      */
     private fun parseStatement(list: List<Token>): String? {
+        // todo figure out how to deal with multiline statements like if/while
+
         val ifs = parseIf(list)
         if (ifs != null) return ifs
 
@@ -161,6 +181,20 @@ class Parser {
      * @return the machine code representation of the if statement
      */
     private fun parseIf(list: List<Token>): String? {
+        /*
+        func main
+        loadr 0
+        loadr 1
+        call >
+        if
+        goto 8
+        loadr No
+        call print
+        exit
+        loadr Yes
+        call print
+        */
+
         // todo if statement
         return null
     }
@@ -199,7 +233,7 @@ class Parser {
         val body = parseBody(list.subList(index, advanceToLastToken(list, TokenType.BRACE))) ?: return null
 
         // todo fix while loop to actually be the machine code representation using goto
-        return "while\n$expression$body"
+        return "${expression}while\n$body"
     }
 
     /**
