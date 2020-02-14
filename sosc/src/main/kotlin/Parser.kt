@@ -129,10 +129,10 @@ class Parser {
     private fun parseBody(list: List<Token>): String? {
         // If it's only one statement, just return the statement
         val index = advanceNextToken(list, 0, TokenType.NEW_LINE)
-        if (index == -1 || index == list.size - 1) return "${parseStatement(list.subList(0, index - 1))}"
+        if (index == -1 || index == list.size - 1) return "${parseStatement(list.subList(0, index + 1))}"
 
         // Otherwise recursively parse all of the statements
-        return "${parseStatement(list.subList(0, index - 1))}${parseBody(list.subList(index + 1, list.size))}"
+        return "${parseStatement(list.subList(0, index + 1))}${parseBody(list.subList(index + 1, list.size))}"
     }
 
     /**
@@ -257,7 +257,7 @@ class Parser {
         index = advanceSpaceTo(list, index, TokenType.LEFT_PARENTHESES)
         if (index == -1) return null
 
-        var params = parseCallParams(list.subList(index + 1, list.size - 1))
+        var params = parseCallParams(list.subList(index + 1, list.size - 2))
         if (params == null) params = ""
 
         return "${params}call $name\n"
