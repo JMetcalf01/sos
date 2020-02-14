@@ -34,7 +34,8 @@ class Tokenizer constructor(private val inputPath: String, private val outputPat
      */
     fun run() {
         tokenize()
-        writer.write("${Parser().parseFile(tokens)}\n")
+        val compiled = "${Parser().parseFile(tokens)}\n"
+        writer.write(if (compiled == "null\n") throw Exception("Compile failed!") else compiled)
         writer.close()
     }
 
@@ -63,9 +64,16 @@ class Tokenizer constructor(private val inputPath: String, private val outputPat
                 }
             }
 
-            // If it gets here, then it is an unknown variable and we need to detect it.
+            // If it gets here, then it is an unknown variable or a raw and we need to detect it.
             val current = file.substring(i)
             for (x in 0..current.length) {
+                // Detects if it's a raw
+                if (current.substring(0, current.indexOf(TokenType.SPACE.unicode!!)).matches(Regex(TokenType.RAW.unicode!!))) {
+                    val value = current.substring(0, current.indexOf(TokenType.SPACE.unicode))
+                    tokens.add(Token(TokenType.RAW, value))
+                    i += value.length
+                    continue@here
+                }
                 for (special in TokenType.values()) {
                     if (special.unicode != null && current.substring(x).startsWith(special.unicode)) {
                         val name = current.substring(0, x)

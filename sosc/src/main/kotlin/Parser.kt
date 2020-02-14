@@ -1,4 +1,4 @@
-/**
+/**`
  * Checks through the list of tokens for syntax and converts it into 🆘🥐 code.
  * Uses the rules found in ParserLanguage.txt
  *
@@ -18,6 +18,7 @@ class Parser {
      * @param list the list to parse
      */
     fun parseFile(list: List<Token>): String? {
+
         // Advance to the first function
         var index = advanceNextToken(list, 0, TokenType.FUNCTION)
         if (index == -1) throw Exception("Compile failed!")
@@ -48,17 +49,27 @@ class Parser {
         val name = if (list[2].type == TokenType.MAIN) "main" else parseName(list.subList(2, index))
         index++
 
-        // Gets parameters (if it's not the main function)
+        // Gets parameters
         var params = ""
-        if (name != "main") {
-            index = advanceNextToken(list, index, TokenType.LEFT_PARENTHESES)
-            val end = advanceNextToken(list, index, TokenType.RIGHT_PARENTHESES)
-            val test = parseFuncParams(list.subList(index + 1, end))
-            if (test != null) params = test
-        }
+        index = advanceSpaceTo(list, index, TokenType.LEFT_PARENTHESES)
+        if (index == -1) return null
+
+        val end = advanceNextToken(list, index, TokenType.RIGHT_PARENTHESES, TokenType.BRACE)
+        if (end <= index) return null
+
+        val test = parseFuncParams(list.subList(index + 1, end))
+        if (test != null) params = test
+
+        // If main has parameters, it's wrong
+        if (name == "main" && !params.isBlank()) return null
 
         // Gets body
-        val body = parseBody(list.subList(advanceNextToken(list, index, TokenType.NEW_LINE) + 1, advanceToLastToken(list, TokenType.BRACE))) ?: return null
+        val body = parseBody(
+            list.subList(
+                advanceNextToken(list, index, TokenType.UNKNOWN),
+                advanceToLastToken(list, TokenType.BRACE)
+            )
+        ) ?: return null
         return "func $name $params\n$body"
     }
 
@@ -408,14 +419,12 @@ class Parser {
      * @return the string representation of the name
      */
     private fun parseName(list: List<Token>): String? {
-        // todo fix random actual strings from counting!
         if (list.isEmpty()) return null
 
-        for (token in list) {
-            if (token.type == TokenType.RAW) {
-                throw Exception("Name shouldn't be a ")
-            }
-        }
+        // Make sure the name isn't a raw
+        for (token in list)
+            if (token.type == TokenType.RAW)
+                return null
 
         for (token in list) {
             // If there are spaces, it is not valid

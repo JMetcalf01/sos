@@ -27,23 +27,12 @@ enum class TokenType(val unicode: String?) {
     IMPORT("\u27A1"),
     RETURN("\u2B05"),
     COMMENT("\uD83E\uDD56\uD83E\uDD56"),
-    ZERO("0"),
-    ONE("1"),
-    TWO("2"),
-    THREE("3"),
-    FOUR("4"),
-    FIVE("5"),
-    SIX("6"),
-    SEVEN("7"),
-    EIGHT("8"),
-    NINE("9"),
-    PERIOD("."),
     INFINITY("\u267E"),
     AND("\u2194"),
     NEW_LINE("\\n"),
     SPACE(" "),
     UNKNOWN(null),
-    RAW("[a-zA-Z0-9]+");
+    RAW("[a-zA-Z0-9]+|[0-9]+|[0-9]+.[0-9]+");
 }
 
 /**

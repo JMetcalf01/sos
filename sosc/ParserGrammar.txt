@@ -1,3 +1,6 @@
+// This file was written by Jonathan Metcalf with help from Matthew Worzala.
+// It explains the grammar behind the 🆘 language.
+
 FILE -> [FUNCTION[\n]+]+
 
 FUNCTION -> 📝 NAME FUNC_PARAMS 🔶 BODY 🔶 | 📝 💯 FUNC_PARAMS 🔶 BODY 🔶
@@ -28,7 +31,7 @@ RETURN -> ➡ VALUE
 
 EXPRESSION -> VALUE | EXPRESSION OPERATOR EXPRESSION
 
-OPERATOR -> ◀ | ▶ | ✔🤷‍ | ➕ | ➖ | ✖ | ➗
+OPERATOR -> ◀ | ▶ | ✔‍ | ➕ | ➖ | ✖ | ➗
 
 VALUE -> RAW | NAME
 
