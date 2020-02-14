@@ -32,16 +32,16 @@ class Parser {
                 remove.add(list[i])
         }
         // Removes extra new line at the end
-        if (list[list.size - 1].type == TokenType.NEW_LINE) list.removeAt(list.size - 1)
+//        if (list[list.size - 1].type == TokenType.NEW_LINE) list.removeAt(list.size - 1)
 
         list.removeAll(remove)
 
         // Advance to the first function
-        var index = advanceNextToken(list, 0, TokenType.FUNCTION)
+        var index = list.advanceToNext(TokenType.FUNCTION)
         if (index == -1) throw Exception("Compile failed!")
 
         // Try to find the second function
-        index = advanceNextToken(list, index + 1, TokenType.FUNCTION)
+        index = list.advanceToNext(TokenType.FUNCTION, start = index + 1)
         // If it's only one function, just return the statement
         if (index == -1) return "${parseFunction(list.subList(0, list.size))}"
 
@@ -59,20 +59,22 @@ class Parser {
      * @return the machine code representation of the function
      */
     private fun parseFunction(list: List<Token>): String? {
+        if (list.isEmpty()) return null
+
         if (list[0].type != TokenType.FUNCTION) return null
 
         // Gets the name of the function
-        var index = advanceNextToken(list, 2, TokenType.SPACE)
+        var index = list.advanceToNext(TokenType.SPACE, start = 2)
         // Todo check if main below should be the 100 or just "main"
         val name = if (list[2].type == TokenType.MAIN) "main" else parseName(list.subList(2, index))
         index++
 
         // Gets parameters
         var params = ""
-        index = advanceSpaceTo(list, index, TokenType.LEFT_PARENTHESES)
+        index = list.advanceSpaceTo(index, TokenType.LEFT_PARENTHESES)
         if (index == -1) return null
 
-        val end = advanceNextToken(list, index, TokenType.RIGHT_PARENTHESES, TokenType.BRACE)
+        val end = list.advanceToNext(TokenType.RIGHT_PARENTHESES, TokenType.BRACE, start = index)
         if (end <= index) return null
 
         val test = parseFuncParams(list.subList(index + 1, end))
@@ -84,8 +86,8 @@ class Parser {
         // Gets body
         val body = parseBody(
             list.subList(
-                advanceNextToken(list, advanceNextToken(list, index, TokenType.BRACE), TokenType.NEW_LINE) + 1,
-                advanceToLastToken(list, TokenType.BRACE)
+                list.advanceToNext(TokenType.NEW_LINE, start = list.advanceToNext(TokenType.BRACE, start = index)) + 1,
+                list.advanceToLast(TokenType.BRACE)
             )
         ) ?: return null
         return "func $name $params\n$body"
@@ -107,7 +109,7 @@ class Parser {
         // Check to make sure all the tokens are valid
         var index = 0
         for (token in list) {
-            var next = advanceNextToken(list, index, TokenType.SPACE)
+            var next = list.advanceToNext(TokenType.SPACE, start = index)
             if (next == -1) next = list.size
             if (token.type != TokenType.SPACE && parseName(list.subList(index, next)) == null) return null
             else index = next + 1
@@ -127,9 +129,12 @@ class Parser {
      * @return the machine code representation of the body
      */
     private fun parseBody(list: List<Token>): String? {
+        if (list.isEmpty()) return null
+
         // If it's only one statement, just return the statement
-        val index = advanceNextToken(list, 0, TokenType.NEW_LINE)
-        if (index == -1 || index == list.size - 1) return "${parseStatement(list.subList(0, index + 1))}"
+        val index = list.advanceToNext(TokenType.NEW_LINE)
+        if (index == -1) return "${parseStatement(list.subList(0, list.size))}"
+        if (index == list.size - 1) return "${parseStatement(list.subList(0, index + 1))}"
 
         // Otherwise recursively parse all of the statements
         return "${parseStatement(list.subList(0, index + 1))}${parseBody(list.subList(index + 1, list.size))}"
@@ -145,6 +150,8 @@ class Parser {
      * @return the machine code representation of the statement
      */
     private fun parseStatement(list: List<Token>): String? {
+        if (list.isEmpty()) return null
+
         // todo figure out how to deal with multiline statements like if/while
 
         val ifs = parseIf(list)
@@ -159,7 +166,7 @@ class Parser {
         val declaration = parseDeclaration(list)
         if (declaration != null) return declaration
 
-        val set = parseSet(list)
+        val set = parseSet(list as MutableList<Token>)
         if (set != null) return set
 
         val returns = parseReturn(list)
@@ -181,6 +188,8 @@ class Parser {
      * @return the machine code representation of the if statement
      */
     private fun parseIf(list: List<Token>): String? {
+        if (list.isEmpty()) return null
+
         /*
         func main
         loadr 0
@@ -209,28 +218,30 @@ class Parser {
      * @return the machine code representation of the while loop
      */
     private fun parseWhile(list: List<Token>): String? {
+        if (list.isEmpty()) return null
+
         // Should start with a while keyword
         var index = 0
         if (list[index].type != TokenType.WHILE) return null
         index++
 
-        index = advanceSpaceTo(list, index, TokenType.LEFT_PARENTHESES)
+        index = list.advanceSpaceTo(index, TokenType.LEFT_PARENTHESES)
 
         // Should have a left parentheses
         if (list[index].type != TokenType.LEFT_PARENTHESES) return null
         index++
 
         // Now parse the expression and right parentheses
-        val right = advanceNextToken(list, index, TokenType.RIGHT_PARENTHESES)
+        val right = list.advanceToNext(TokenType.RIGHT_PARENTHESES, start = index)
         val expression = parseExpression(list.subList(index, right)) ?: return null
         index = right
         if (list[index].type != TokenType.RIGHT_PARENTHESES) return null
 
         // Finds the next brace with any amount of spaces
-        index = advanceSpaceTo(list, index, TokenType.BRACE)
+        index = list.advanceSpaceTo(index, TokenType.BRACE)
         if (index != -1) index++ else return null
 
-        val body = parseBody(list.subList(index, advanceToLastToken(list, TokenType.BRACE))) ?: return null
+        val body = parseBody(list.subList(index, list.advanceToLast(TokenType.BRACE))) ?: return null
 
         // todo fix while loop to actually be the machine code representation using goto
         return "${expression}while\n$body"
@@ -246,19 +257,21 @@ class Parser {
      * @return the machine code representation of the list of parameters being loaded
      */
     private fun parseCall(list: List<Token>): String? {
+        if (list.isEmpty()) return null
+
         // Index will be sitting at the left parentheses or space after this
-        var index = advanceNextToken(list, 0, TokenType.LEFT_PARENTHESES, TokenType.SPACE)
+        var index = list.advanceToNext(TokenType.LEFT_PARENTHESES)
         if (index == -1) return null
 
         // Checks whether name of function is valid
         val name = parseName(list.subList(0, index)) ?: return null
 
         // Advances index to be definitely at the left parentheses
-        index = advanceSpaceTo(list, index, TokenType.LEFT_PARENTHESES)
+        index = list.advanceSpaceTo(index, TokenType.LEFT_PARENTHESES)
         if (index == -1) return null
 
-        var params = parseCallParams(list.subList(index + 1, list.size - 2))
-        if (params == null) params = ""
+        var params = parseCallParams(list.subList(index + 1, if (list[list.size - 1].type != TokenType.NEW_LINE) list.size - 1 else list.size - 2))
+        if (params == null || params == "null") params = ""
 
         return "${params}call $name\n"
     }
@@ -281,7 +294,7 @@ class Parser {
         if (value != null) return value
 
         // If the list has multiple values, recursively check each whether it's a value
-        val index = advanceNextToken(list, 0, TokenType.SPACE)
+        val index = list.advanceToNext(TokenType.SPACE)
         if (index == -1) return null
 
         return "${parseValue(list.subList(0, index))}${parseCallParams(list.subList(index + 1, list.size))}"
@@ -301,7 +314,7 @@ class Parser {
 
         if (list[0].type != TokenType.VAR || list[1].type != TokenType.SPACE) return null
 
-        return parseSet(list.subList(2, list.size))
+        return parseSet(list.subList(2, list.size) as MutableList<Token>)
     }
 
     /**
@@ -310,26 +323,20 @@ class Parser {
      *
      * @author Jonathan Metcalf
      *
-     * @param list the list of tokens
+     * @param toParse the list of tokens
      * @return the machine code representation of the setting
      */
-    private fun parseSet(list: List<Token>): String? {
+    private fun parseSet(toParse: MutableList<Token>): String? {
+        val list = toParse.filter { it.type != TokenType.SPACE }
         if (list.isEmpty()) return null
 
-        // Remove spaces
-        val mutable = list.toMutableList()
-        val toRemove = mutableListOf<Token>()
-        for (token in mutable)
-            if (token.type == TokenType.SPACE) toRemove.add(token)
-        mutable.removeAll(toRemove)
-
         // Index will be sitting at the equals sign after this
-        val index = advanceNextToken(mutable, 0, TokenType.EQUALS)
+        val index = list.advanceToNext(TokenType.EQUALS)
         if (index == -1) return null
 
         // Check to make sure it is a valid name and value
-        val name = parseName(mutable.subList(0, index))
-        val expression = parseExpression(mutable.subList(index + 1, mutable.size))
+        val name = parseName(list.subList(0, index))
+        val expression = parseExpression(list.subList(index + 1, list.size - 1))
         if (name == null || expression == null) return null
 
         return "${expression}store ${name}\n"
@@ -423,6 +430,8 @@ class Parser {
      * @return the machine code representation of continue
      */
     private fun parseContinue(list: List<Token>): String? {
+        if (list.isEmpty()) return null
+
         // todo actually make this work
         return if (list.size == 1 && list[0].type == TokenType.CONTINUE) "continue\n"
         else null
@@ -438,6 +447,8 @@ class Parser {
      * @return the machine code representation of the value
      */
     private fun parseValue(list: List<Token>): String? {
+        if (list.isEmpty()) return null
+
         val name = parseName(list)
         val raw = parseRaw(list)
         if (name != null) return "load $name\n"
@@ -500,65 +511,62 @@ class Parser {
         // Otherwise, it doesn't match anything
         return null
     }
+}
 
-    /**
-     * Finds the first token after a starting index that matches with the list of tokens put in,
-     * and returns the index of that first token.
-     *
-     * @author Jonathan Metcalf
-     *
-     * @param list the list of tokens
-     * @param start the starting index to look for
-     * @param types the list of tokens that should stop the search
-     * @return the index of the first token found that is contained in types, or -1 if not found
-     */
-    private fun advanceNextToken(list: List<Token>, start: Int = 0, vararg types: TokenType): Int {
-        var index = start
-        while (!types.contains(list[index].type)) {
-            if (index == list.size - 1) return -1
-            index++
-        }
-        return index
+/**
+ * Finds the first token after a starting index that matches with the list of tokens put in,
+ * and returns the index of that first token.
+ *
+ * @author Jonathan Metcalf
+ *
+ * @param start the starting index to look for
+ * @param types the list of tokens that should stop the search
+ * @return the index of the first token found that is contained in types, or -1 if not found
+ */
+private fun List<Token>.advanceToNext(vararg types: TokenType, start: Int = 0): Int {
+    var index = start
+    while (!types.contains(this[index].type)) {
+        if (index == size - 1) return -1
+        index++
     }
+    return index
+}
 
-    /**
-     * Finds the first token after a starting index that matches with the list of tokens put in,
-     * and returns the index of that first token.
-     *
-     * In this case, the tokens in between must all be of spaces or new lines.
-     *
-     * @author Jonathan Metcalf
-     *
-     * @param list the list of tokens
-     * @param start the starting index to look for
-     * @param types the list of tokens that should stop the search
-     * @return the index of the first token found that is contained in types, or -1 if not found
-     */
-    private fun advanceSpaceTo(list: List<Token>, start: Int = 0, vararg types: TokenType): Int {
-        var index = start
-        while (!(types.contains(list[index].type)) && (list[index].type == TokenType.SPACE || list[index].type == TokenType.NEW_LINE)) {
-            if (index == list.size - 1) return start + 1
-            index++
-        }
-        return index
+/**
+ * Finds the first token after a starting index that matches with the list of tokens put in,
+ * and returns the index of that first token.
+ *
+ * In this case, the tokens in between must all be of spaces or new lines.
+ *
+ * @author Jonathan Metcalf
+ *
+ * @param start the starting index to look for
+ * @param types the list of tokens that should stop the search
+ * @return the index of the first token found that is contained in types, or -1 if not found
+ */
+private fun List<Token>.advanceSpaceTo(start: Int = 0, vararg types: TokenType): Int {
+    var index = start
+    while (!(types.contains(this[index].type)) && (this[index].type == TokenType.SPACE || this[index].type == TokenType.NEW_LINE)) {
+        if (index == this.size - 1) return start + 1
+        index++
     }
+    return index
+}
 
-    /**
-     * Advances to the last token in the list of the specified type.
-     *
-     * @param list the list of tokens
-     * @param type the type of token
-     * @return the index of the last token, or -1 if not found
-     */
-    private fun advanceToLastToken(list: List<Token>, type: TokenType): Int {
-        var index = -1
-        list.forEachIndexed { i, token ->
-            if (token.type == type) {
-                index = i
-            }
+/**
+ * Advances to the last token in the list of the specified type.
+ *
+ * @param type the type of token
+ * @return the index of the last token, or -1 if not found
+ */
+private fun List<Token>.advanceToLast(type: TokenType): Int {
+    var index = -1
+    forEachIndexed { i, token ->
+        if (token.type == type) {
+            index = i
         }
-        return index
     }
+    return index
 }
 
 /**
