@@ -12,7 +12,6 @@ C++ Interpreter / Scheduler (.🆘🥐)
 | 📝    | function  |
 | 📝 💯		  | main function  |
 |🤔 |if|
-|🤷‍🤔 |else if|
 |👉|else|
 |🌜🌛	|	parentheses|
 |🔁		|while|
