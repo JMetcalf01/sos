@@ -1,4 +1,6 @@
 import java.io.*
+import java.nio.file.Files
+import java.nio.file.Paths
 
 /**
  * The entry point into the program. The first argument should be
@@ -29,7 +31,7 @@ class Tokenizer {
     fun run(args: Array<String>) {
         // Defaults to SOS unless user overrides with args
         // Reads the file and skips to the beginning of the parsing
-        val reader = BufferedReader(FileReader(if (args.isEmpty()) "sos" else args[0]))
+        val reader = Files.newBufferedReader(Paths.get(if (args.isEmpty()) "sos" else args[0]))
         var file = ""
         reader.lines().forEach { file += "$it\n" }
 
@@ -46,7 +48,7 @@ class Tokenizer {
         for (index in lines.indices) {
             var fileName = lines[index]
             if (!lines[index].endsWith(".🆘")) fileName += ".🆘"
-            compileFile("$inputDirectory/$fileName", "$outputDirectory/$fileName🥐")
+            compileFile("$inputDirectory\\$fileName", "$outputDirectory\\$fileName🥐")
         }
     }
 
@@ -73,7 +75,7 @@ class Tokenizer {
      */
     private fun tokenize(inputPath: String): List<Token> {
         // Read file to string
-        val reader = BufferedReader(FileReader(inputPath))
+        val reader = Files.newBufferedReader(Paths.get(inputPath))
         var file = ""
         reader.lines().forEach { file += "$it \\n " }
         file = Regex("[ ]+").replace(file, " ")
@@ -129,9 +131,10 @@ class Tokenizer {
      */
     private fun compile(tokens: MutableList<Token>, outputPath: String) {
         val compiled = "${Parser().parseFile(tokens)}\n"
-        val writer = BufferedWriter(FileWriter(outputPath))
-        writer.write(if (compiled == "null\n") throw Exception("Compile failed!") else compiled)
-        writer.close()
+        val writer = Files.newBufferedWriter(Paths.get(outputPath))
+        writer.use {
+            if (compiled == "null\n") throw Exception("Compile failed!") else it.write(compiled)
+        }
     }
 }
 
