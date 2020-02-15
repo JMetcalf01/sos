@@ -35,7 +35,8 @@ int main() {
     instruction("if", Instructions::ifelse);
 
     // Load Native Functions
-    native("print", NativeFunction::print);
+    native("🖨", NativeFunction::print);
+    native("📄", NativeFunction::printr);
     native("!", NativeFunction::invert);
     native("&&", NativeFunction::boolAnd);
     native("||", NativeFunction::boolOr);
@@ -101,6 +102,7 @@ std::vector<std::string>  readFile()
     std::vector<std::string> linesImport;
 
     std::ifstream file("/Users/mattworzala/dev/cpp/sos/test.txt");
+//    std::ifstream file("/Users/mattworzala/dev/cpp/sos/example/gamble.🆘🥐");
     std::string str;
     while (std::getline(file, str)) {
         linesImport.push_back(str);

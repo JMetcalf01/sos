@@ -43,7 +43,8 @@ void sos::Instructions::loadr(std::map<std::string, std::string> *memory, sos::V
 void sos::Instructions::read(std::map<std::string, std::string> *memory, sos::VariableStack *stack, int *cursor,
                              std::vector<std::string> params) {
     std::string value;
-    std::getline(std::cin, value);
+    std::cin >> value;
+//    getline(std::cin, value);
     stack->load(value);
 }
 

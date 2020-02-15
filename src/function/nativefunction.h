@@ -14,6 +14,8 @@ namespace sos {
 
         static void print(VariableStack* stack);
 
+        static void printr(VariableStack* stack);
+
         // !
         // Inverts a 1 or a 0 on the stack.
         static void invert(VariableStack* stack);

@@ -1,3 +1,75 @@
-func 💯
-loadr Hello, World
-call 🖨 
+func main
+store 💰 100
+load 💰
+loadr 0
+call >
+if
+goto 9
+loadr You are bankrupt!
+call 🖨
+exit
+load 💰
+call 🤑
+read
+store 💸
+load 💸
+load 💰
+call >
+goto 18
+goto 22
+read
+store 💸
+goto 13
+loadr Enter a number to bet on [1-6]:
+call 🖨
+read
+store 🔢
+load 🔢
+loadr 1
+call <
+store 125152
+load 🔢
+load 6
+call >
+load 125152
+call ||
+goto 36
+goto 39
+read
+store 🔢
+goto 25
+load 5
+call 🎲
+store 🤭
+load 🤭
+loadr 1
+call +
+store 🤭
+load 🤭
+load 🔢
+call ==
+if
+goto 58
+loadr You were wrong!
+call 🖨
+load 💰
+load 💸
+call -
+store 💰
+goto 1
+loadr You were correct!
+call 🖨
+load 💰
+load 💸
+call +
+store 💰
+goto 1
+
+func 🤑 💰
+loadr Your balance is
+call 📄
+load 💰
+call 🖨
+loadr Enter an amount to bet:
+call 🖨
+

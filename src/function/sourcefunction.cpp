@@ -18,6 +18,8 @@ void sos::SourceFunction::execute(sos::VariableStack *stack) {
         memory.insert(std::pair(param, stack->take()));
 
     for (int i = 0; i < m_body->size(); i++) {
+        if (m_body->at(i).empty())
+            continue;
         std::vector<std::string> elements = Util::split(m_body->at(i), ' ');
         std::vector<std::string> params(elements.begin() + 1, elements.end());
         if (elements[0] == "exit")

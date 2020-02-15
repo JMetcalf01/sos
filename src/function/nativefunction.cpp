@@ -4,6 +4,10 @@ void sos::NativeFunction::print(sos::VariableStack *stack) {
     std::cout << stack->take() << std::endl;
 }
 
+void sos::NativeFunction::printr(sos::VariableStack *stack) {
+    std::cout << stack->take();
+}
+
 void sos::NativeFunction::invert(VariableStack* stack) {
     stack->load(stack->take() == "0");
 }
@@ -23,8 +27,8 @@ void sos::NativeFunction::equals(sos::VariableStack *stack) {
 }
 
 void sos::NativeFunction::greater(sos::VariableStack *stack) {
-    int left = std::stoi(stack->take());
-    int right = std::stoi(stack->take());
+    int left = stoi(stack->take());
+    int right = stoi(stack->take());
     stack->load(left > right);
 }
 

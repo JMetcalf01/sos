@@ -1,28 +1,31 @@
-📝 💯 🌜🌛
+📝 💯 🔶
+    💲💰🎞100
+    🔁🌜💰▶0🌛🔶
+        🤑🌜💰🌛
+        💲💸🎞💬🌜🌛
+        🔁🌜💸▶💰🌛🔶
+            💲💸🎞💬🌜🌛
+        🔶
+        🖨🌜🔤Enter a number to bet on [1-6]:🔤🌛
+        💲🔢🎞💬🌜🌛
+        🔁🌜🔢◀1    OR    🔢▶6🌛🔶
+            💲🔢🎞💬🌜🌛
+        🔶
+        💲🤭🎞🎲🌜5🌛
+        💲🤭🎞🤭➕1
+        🤔🌜🤭✔🔢🌛🔶
+            🖨🌜🔤You were correct!🔤🌛
+            💲💰🎞💰➕💸
+        🔶👉🔶
+            🖨🌜🔤You were wrong!🔤🌛
+            💲💰🎞💰➖💸
+        🔶
+    🔶
+    🖨🌜🔤You are bankrupt!🔤🌛
+🔶
 
-
-
-# Pseudo
-balance = 0
-while (balance > 0) {
-    printr("Your balance is ")
-    print(balance)
-    print("Enter an amount to bet:")
-    amt = readinput()
-    while (amt > balance) {
-        amt = readinput()
-    }
-    print("Enter a number to bet on [1-6]:")
-    number = readinput()
-    while (number < 1 || number > 6) {
-        number = readinput()
-    }
-    actual = random()
-    if (actual == number) {
-        print("You were correct!")
-        balance = balance + amt
-    } else {
-        print("You were wrong!")
-        balance = balance - amt
-    }
-}
+📝 🤑 🌜💰🌛 🔶
+    📄🌜🔤Your balance is 🔤🌛
+    🖨🌜💰🌛
+    🖨🌜🔤Enter an amount to bet:🔤🌛
+🔶
