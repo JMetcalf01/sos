@@ -1,0 +1,16 @@
+// The list of files (as well as their input and output directories) that you want compiled goes here.
+// The input directory defaults to "sossource" without the quotes.
+// The output directory defaults to "sosbuild" without the quotes.
+// The input and output directories are both not mandatory -- if one or both is missing, they are defaulted as shown above.
+// Otherwise, put them on the line below their respective marker.
+
+// The files go after the file marker and do not require an extension (but it is okay to have one).
+
+INPUT DIRECTORY:
+sossource
+
+OUTPUT DIRECTORY:
+sosbuild
+
+FILES:
+test

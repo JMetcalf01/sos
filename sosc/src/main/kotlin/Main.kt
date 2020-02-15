@@ -9,34 +9,58 @@ import java.io.*
  * @param args the arguments to the function
  */
 fun main(args: Array<String>) {
-    Tokenizer(args[0], args[1]).run()
+    Tokenizer().run(args)
 }
 
 /**
  * Parses a sos file and compiles it.
  *
  * @author Jonathan Metcalf
- *
- * @property inputPath the path of the file to be compiled
- * @property outputPath the path to write the compiled 🆘🥐 code to
  */
-class Tokenizer constructor(private val inputPath: String, private val outputPath: String) {
-
-    private val reader: BufferedReader = BufferedReader(FileReader(inputPath))
-    private val regex: Regex = Regex("[ ]+")
-    private val tokens: MutableList<Token> = mutableListOf()
-    private val writer = BufferedWriter(FileWriter(outputPath))
+class Tokenizer {
 
     /**
-     * Parses through every line of the program to be compiled.
+     * Parses through the list of files to parse and parses each individual one
      *
      * @author Jonathan Metcalf
+     *
+     * @param args should either be nothing or the path to the file containing the list of files to compile and their output paths
      */
-    fun run() {
-        tokenize()
-        val compiled = "${Parser().parseFile(tokens)}\n"
-        writer.write(if (compiled == "null\n") throw Exception("Compile failed!") else compiled)
-        writer.close()
+    fun run(args: Array<String>) {
+        // Defaults to SOS unless user overrides with args
+        // Reads the file and skips to the beginning of the parsing
+        val reader = BufferedReader(FileReader(if (args.isEmpty()) "sos" else args[0]))
+        var file = ""
+        reader.lines().forEach { file += "$it\n" }
+
+        // Get input and output directories
+        val inputDirectory =
+            if (file.indexOf("INPUT DIRECTORY:") == -1) "sossource"
+            else file.substring(file.indexOf("INPUT DIRECTORY:") + "INPUT DIRECTORY:".length + 1, file.nextIndexOf("\n", file.indexOf("INPUT DIRECTORY:") + "INPUT DIRECTORY:".length + 1))
+        val outputDirectory =
+            if (file.indexOf("OUTPUT DIRECTORY:") == -1) "sosbuild"
+            else file.substring(file.indexOf("OUTPUT DIRECTORY:") + "OUTPUT DIRECTORY:".length + 1, file.nextIndexOf("\n", file.indexOf("OUTPUT DIRECTORY:") + "OUTPUT DIRECTORY:".length + 1))
+
+        // Compile every file in the list
+        val lines = (file.substring(file.indexOf("FILES:") + "FILES:".length + 1).split("\n") as MutableList<String>).filter { it != "" }
+        for (index in lines.indices) {
+            var fileName = lines[index]
+            if (!lines[index].endsWith(".🆘")) fileName += ".🆘"
+            compileFile("$inputDirectory/$fileName", "$outputDirectory/$fileName🥐")
+        }
+    }
+
+    /**
+     * Parses through every line of the file to be compiled.
+     *
+     * @author Jonathan Metcalf
+     *
+     * @param inputPath the path of the file to be compiled
+     * @param outputPath the path to write the compiled 🆘🥐 code to
+     */
+    private fun compileFile(inputPath: String, outputPath: String) {
+        val tokens = tokenize(inputPath)
+        compile(tokens as MutableList<Token>, outputPath)
     }
 
     /**
@@ -44,23 +68,27 @@ class Tokenizer constructor(private val inputPath: String, private val outputPat
      *
      * @author Jonathan Metcalf
      *
+     * @param inputPath the input path of the file to tokenize
+     * @return the list of tokens generated
      */
-    private fun tokenize() {
+    private fun tokenize(inputPath: String): List<Token> {
         // Read file to string
+        val reader = BufferedReader(FileReader(inputPath))
         var file = ""
         reader.lines().forEach { file += "$it \\n " }
-        file = regex.replace(file, " ")
+        file = Regex("[ ]+").replace(file, " ")
 
         // Tokenize it
         var i = 0
-        here@while (i < file.length) {
+        val tokens: MutableList<Token> = mutableListOf()
+        here@ while (i < file.length) {
             // Check every keyword
             for (special in TokenType.values()) {
                 if (i >= file.length) break
                 if (special.unicode != null && file.substring(i).startsWith(special.unicode)) {
-                        tokens.add(Token(special, special.unicode))
-                        i += if (special == TokenType.NEW_LINE) 3 else special.unicode.length
-                        continue@here
+                    tokens.add(Token(special, special.unicode))
+                    i += if (special == TokenType.NEW_LINE) 3 else special.unicode.length
+                    continue@here
                 }
             }
 
@@ -68,7 +96,11 @@ class Tokenizer constructor(private val inputPath: String, private val outputPat
             val current = file.substring(i)
             for (x in 0..current.length) {
                 // Detects if it's a raw
-                if (current.substring(0, current.indexOf(TokenType.SPACE.unicode!!)).matches(Regex(TokenType.RAW.unicode!!))) {
+                if (current.substring(
+                        0,
+                        current.indexOf(TokenType.SPACE.unicode!!)
+                    ).matches(Regex(TokenType.RAW.unicode!!))
+                ) {
                     val value = current.substring(0, current.indexOf(TokenType.SPACE.unicode))
                     tokens.add(Token(TokenType.RAW, value))
                     i += value.length
@@ -84,5 +116,37 @@ class Tokenizer constructor(private val inputPath: String, private val outputPat
                 }
             }
         }
+        return tokens
     }
+
+    /**
+     * Compiles a list of tokens and writes it to a file.
+     *
+     * @author Jonathan Metcalf
+     *
+     * @param tokens the list of tokens to be compiled
+     * @param outputPath the output path to write to
+     */
+    private fun compile(tokens: MutableList<Token>, outputPath: String) {
+        val compiled = "${Parser().parseFile(tokens)}\n"
+        val writer = BufferedWriter(FileWriter(outputPath))
+        writer.write(if (compiled == "null\n") throw Exception("Compile failed!") else compiled)
+        writer.close()
+    }
+}
+
+/**
+ * Returns the next index of a string given the starting index and the string to look for
+ *
+ * @author Jonathan Metcalf
+ *
+ * @param test the string testing for
+ * @param startIndex the starting index to start looking
+ * @return the index of the tested string, or -1 if not found
+ */
+fun String.nextIndexOf(test: String, startIndex: Int = 0): Int {
+    for (index in startIndex until length) {
+        if (this.substring(index).startsWith(test)) return index
+    }
+    return -1
 }
