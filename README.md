@@ -68,7 +68,7 @@ C++ Interpreter / Scheduler (.🆘🥐)
 ~~~
 
 ## Running Files 
-Curently, there is no set way to navigate the full pipeline; therefore, to run your .🆘 code, you will need to 
+Currently, there is no set way to navigate the full pipeline; therefore, to run your .🆘 code, you will need to 
 have both Kotlin and C++ compilers on your device and your respective IDE of choice.
 
 Because of this, we suggest writing your code in .🆘 as it is obviously superior.
