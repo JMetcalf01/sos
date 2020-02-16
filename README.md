@@ -1,4 +1,4 @@
-# .🆘🥐 -> A New Generation for code!
+# .🆘 -> A New Generation for code!
 A programming language made up of emojis.
 
 ## Structure
