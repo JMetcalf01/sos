@@ -18,6 +18,8 @@ class Parser {
      * @param list the list to parse
      */
     fun parseFile(list: MutableList<Token>): String? {
+        if (list.isEmpty()) return null
+
         // Does some cleaning up before it parses it
         val remove = mutableListOf<Token>()
 
