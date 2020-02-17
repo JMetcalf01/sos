@@ -36,10 +36,10 @@ class Tokenizer {
 
         // Get input and output directories
         val inputDirectory =
-            if (file.indexOf("INPUT DIRECTORY:") == -1) "sossource"
+            if (file.indexOf("INPUT DIRECTORY:") == -1) "_sossource"
             else file.substring(file.indexOf("INPUT DIRECTORY:") + "INPUT DIRECTORY:".length + 1, file.nextIndexOf("\n", file.indexOf("INPUT DIRECTORY:") + "INPUT DIRECTORY:".length + 1))
         val outputDirectory =
-            if (file.indexOf("OUTPUT DIRECTORY:") == -1) "sosbuild"
+            if (file.indexOf("OUTPUT DIRECTORY:") == -1) "_sosbuild"
             else file.substring(file.indexOf("OUTPUT DIRECTORY:") + "OUTPUT DIRECTORY:".length + 1, file.nextIndexOf("\n", file.indexOf("OUTPUT DIRECTORY:") + "OUTPUT DIRECTORY:".length + 1))
 
         // Compile every file in the list
