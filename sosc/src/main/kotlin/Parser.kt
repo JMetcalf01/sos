@@ -66,18 +66,16 @@ class Parser {
         }
         list.removeAll(remove)
 
-        // Advance to the first function (if not found, then
         if (list[0].type != TokenType.FUNCTION) return null
-
-        // Try to find the second function
         val index = list.advanceToNext(TokenType.FUNCTION, start = 1)
-        // If it's only one function, just return the statement
+
+        // If there is no second function, parse all of it as one function
         if (index == -1) return "${parseFunction(list.subList(0, list.size))}"
 
-        // Otherwise recursively parse all of the statements
-        return "${parseFunction(list.subList(0, index))}" +
-                "\n" +
-                "${parseFile(list.subList(index, list.size))}"
+        // Otherwise recursively parse all of the functions
+        val first = parseFunction(list.subList(0, index)) ?: return null
+        val body = parseFile(list.subList(index, list.size)) ?: return first
+        return "$first\n$body"
     }
 
     /**
@@ -343,7 +341,7 @@ class Parser {
             list[list.size - 3].type == TokenType.PLUS &&
             list[list.size - 2].type == TokenType.PLUS &&
             list[list.size - 1].type == TokenType.SEMICOLON
-        ) return "load 1\nloadr $name\ncall +\nstore $name"
+        ) return "load 1\nloadr $name\n+\nstore $name"
 
         // Checks for NAME--
         index = list.advanceToNext(TokenType.PLUS)
@@ -353,7 +351,7 @@ class Parser {
             list[list.size - 3].type == TokenType.MINUS &&
             list[list.size - 2].type == TokenType.MINUS &&
             list[list.size - 1].type == TokenType.SEMICOLON
-        ) return "loadr $name\nload 1\ncall -\nstore $name"
+        ) return "loadr $name\nload 1\n-\nstore $name"
 
         // todo add x+=, x-=, x*=, x/=
 
@@ -379,6 +377,8 @@ class Parser {
      */
     private fun parseExpression(list: List<Token>): String? {
         if (list.isEmpty()) return null
+
+        // todo order of operations correctly, and make functions integrated into expressions (as functions can return values)
 
         val value = parseValue(list)
         if (value != null) return value
@@ -554,26 +554,6 @@ private fun List<Token>.advanceToNext(vararg types: TokenType, start: Int = 0): 
     return index
 }
 
-/**
- * Finds the first token after a starting index that matches with the list of tokens put in,
- * and returns the index of that first token.
- *
- * In this case, the tokens in between must all be of spaces or new lines.
- *
- * @author Jonathan Metcalf
- *
- * @param start the starting index to look for
- * @param types the list of tokens that should stop the search
- * @return the index of the first token found that is contained in types, or -1 if not found
- */
-private fun List<Token>.advanceSpaceTo(start: Int = 0, vararg types: TokenType): Int {
-    var index = start
-    while (!(types.contains(this[index].type)) && (this[index].type == TokenType.SPACE || this[index].type == TokenType.NEW_LINE)) {
-        if (index == this.size - 1) return start + 1
-        index++
-    }
-    return index
-}
 
 /**
  * Advances to the last token in the list of the specified type.
@@ -609,13 +589,4 @@ private fun List<Token>.nextIndexOf(start: Int, vararg matches: TokenType): Int 
             return i
     }
     return start + 1
-}
-
-private fun List<Token>.contains(vararg contained: TokenType): Boolean {
-    for (i in indices) {
-        if (contained.contains(this[i].type)) {
-            return true
-        }
-    }
-    return false
 }
