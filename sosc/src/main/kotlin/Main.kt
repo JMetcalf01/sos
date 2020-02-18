@@ -36,10 +36,10 @@ class Tokenizer {
 
         // Get input and output directories
         val inputDirectory =
-            if (file.indexOf("INPUT DIRECTORY:") == -1) "_sossource"
+            if (file.indexOf("INPUT DIRECTORY:") == -1) "..\\_sossource"
             else file.substring(file.indexOf("INPUT DIRECTORY:") + "INPUT DIRECTORY:".length + 1, file.nextIndexOf("\n", file.indexOf("INPUT DIRECTORY:") + "INPUT DIRECTORY:".length + 1))
         val outputDirectory =
-            if (file.indexOf("OUTPUT DIRECTORY:") == -1) "_sosbuild"
+            if (file.indexOf("OUTPUT DIRECTORY:") == -1) "..\\_sosbuild"
             else file.substring(file.indexOf("OUTPUT DIRECTORY:") + "OUTPUT DIRECTORY:".length + 1, file.nextIndexOf("\n", file.indexOf("OUTPUT DIRECTORY:") + "OUTPUT DIRECTORY:".length + 1))
 
         // Compile every file in the list
@@ -77,7 +77,6 @@ class Tokenizer {
         val reader = Files.newBufferedReader(Paths.get(inputPath))
         var file = ""
         reader.lines().forEach { file += "$it \\n " }
-        file = Regex("[ ]+").replace(file, " ")
 
         // Tokenize it
         var i = 0
@@ -107,6 +106,7 @@ class Tokenizer {
                     i += value.length
                     continue@here
                 }
+                // Otherwise, it's an unknown variable
                 for (special in TokenType.values()) {
                     if (special.unicode != null && current.substring(x).startsWith(special.unicode)) {
                         val name = current.substring(0, x)
