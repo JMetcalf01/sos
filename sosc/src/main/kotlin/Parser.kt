@@ -33,12 +33,12 @@ class Parser {
             if (list[i].type == TokenType.LEFT_PARENTHESES) inParams = true
             if (list[i].type == TokenType.RIGHT_PARENTHESES) inParams = false
 
-            // Remove new lines, spaces if not in string
+            // Remove new lines, spaces if not in string and not in parameters
             if ((list[i].type == TokenType.SPACE || list[i].type == TokenType.NEW_LINE) && !inString && !inParams)
                 remove.add(list[i])
 
             // Removes spaces at the beginning of parameters
-            if (list[i].type == TokenType.LEFT_PARENTHESES) {
+            if (list[i].type == TokenType.LEFT_PARENTHESES && list[i + 1].type != TokenType.RIGHT_PARENTHESES) {
                 i++
                 while (list[i].type == TokenType.SPACE) {
                     remove.add(list[i])
@@ -49,7 +49,7 @@ class Parser {
             // Removes spaces at the end of parameters
             if (list[i].type == TokenType.RIGHT_PARENTHESES) {
                 var temp = i - 1
-                while (list[temp].type == TokenType.SPACE) {
+                while (list[temp].type == TokenType.SPACE && list[temp].type != TokenType.LEFT_PARENTHESES) {
                     remove.add(list[temp])
                     temp--
                 }
@@ -154,13 +154,12 @@ class Parser {
 
         // Try to figure if it's a multi-line statement
         var index = list.advanceToNext(TokenType.CLOSE_BRACE)
-        if (index == -1) index = list.advanceToNext(TokenType.SEMICOLON)
+        if (list.advanceToNext(TokenType.SEMICOLON, start = 0) < list.advanceToNext(TokenType.OPEN_BRACE, start = 0) || index == -1)
+            index = list.advanceToNext(TokenType.SEMICOLON)
 
-        // If it's only one single-line statement, just return the statement
-        if (index == -1 || index == list.size - 1) return "${parseStatement(list.subList(0, list.size))}"
-
-        // Otherwise recursively parse all of the statements
-        return "${parseStatement(list.subList(0, index + 1))}${parseBody(list.subList(index + 1, list.size))}"
+        val first = parseStatement(list.subList(0, index + 1)) ?: return null
+        val body = parseBody(list.subList(index + 1, list.size)) ?: return first
+        return "$first$body"  // Recursively parse all of the statements
     }
 
     /**
@@ -196,7 +195,7 @@ class Parser {
         val continues = parseContinue(list)
         if (continues != null) return continues
 
-        return ""
+        return null
     }
 
     /**
@@ -210,20 +209,6 @@ class Parser {
      */
     private fun parseIf(list: List<Token>): String? {
         if (list.isEmpty()) return null
-
-        /*
-         func main
-        0 loadr 0
-        1 loadr 1
-        2 call >
-        3 if
-        4 goto 8
-        5 loadr No
-        8 call print
-        7 exit
-        8 loadr Yes
-        9 call print
-        */
 
         // todo if statement
         return null
@@ -241,31 +226,19 @@ class Parser {
     private fun parseWhile(list: MutableList<Token>): String? {
         if (list.isEmpty()) return null
 
-        // Should start with a while keyword
-        var index = 0
-        if (list[index].type != TokenType.WHILE) return null
-        index++
-
-        index = list.advanceSpaceTo(index, TokenType.LEFT_PARENTHESES)
-
-        // Should have a left parentheses
-        if (list[index].type != TokenType.LEFT_PARENTHESES) return null
-        index++
+        // Should start with a while keyword and should have a left parentheses
+        if (list[0].type != TokenType.WHILE || list[1].type != TokenType.LEFT_PARENTHESES) return null
 
         // Now parse the expression and right parentheses
-        val right = list.advanceToNext(TokenType.RIGHT_PARENTHESES, start = index)
-        val expression = parseExpression(list.subList(index, right)) ?: return null
-        index = right
-        if (list[index].type != TokenType.RIGHT_PARENTHESES) return null
+        val right = list.advanceToNext(TokenType.RIGHT_PARENTHESES)
+        if (right == -1) return null
+        val expression = parseExpression(list.subList(2, right)) ?: return null
 
-        // Finds the next brace with any amount of spaces
-        index = list.advanceSpaceTo(index, TokenType.CLOSE_BRACE)
-        if (index != -1) index++ else return null
-
-        val body = parseBody(list.subList(index + 2, list.advanceToLast(TokenType.CLOSE_BRACE))) ?: return null
+        // Parse the body
+        val body = parseBody(list.subList(right + 2, list.size - 1)) ?: return null
 
         // todo fix while loop to actually be the machine code representation using goto
-        return "${expression}if\n$body"
+        return "${expression}while blah blah\n$body"
     }
 
     /**
@@ -280,6 +253,8 @@ class Parser {
     private fun parseCall(list: List<Token>): String? {
         if (list.isEmpty()) return null
 
+        // todo if it's an operator, don't do call
+
         // Index will be sitting at the left parentheses or space after this
         val index = list.advanceToNext(TokenType.LEFT_PARENTHESES)
         if (index == -1) return null
@@ -288,8 +263,12 @@ class Parser {
         val name = parseName(list.subList(0, index)) ?: return null
 
         // Checks parameters of function
-        var params = parseCallParams(list.subList(index + 1, list.size - 1))
+        val end = list.advanceToLast(TokenType.RIGHT_PARENTHESES)
+        if (end == -1) return null
+        var params = parseCallParams(list.subList(index + 1, end))
         if (params == null || params == "null") params = ""
+
+        if (list.size > end + 2 || list[end + 1].type != TokenType.SEMICOLON) return null
 
         return "${params}call $name\n"
     }
@@ -304,10 +283,10 @@ class Parser {
      * @return the machine code representation of the list of parameters being loaded
      */
     private fun parseCallParams(list: List<Token>): String? {
-        // If list is empty, return empty list
+        // If list is empty, return empty string
         if (list.isEmpty()) return ""
 
-        // If list has a single value, then return a list containing that one value
+        // If list has a single value, then return its string
         val value = parseValue(list)
         if (value != null) return value
 
@@ -320,7 +299,7 @@ class Parser {
 
     /**
      * Parses a declaration based on the following rule:
-     * DECLARE -> 💲 SET
+     * DECLARE -> 💲 NAME 🎞 EXPRESSION
      *
      * @author Jonathan Metcalf
      *
@@ -328,36 +307,65 @@ class Parser {
      * @return the machine code representation of the declaration
      */
     private fun parseDeclaration(list: List<Token>): String? {
-        if (list.isEmpty()) return null
-
-        if (list[0].type != TokenType.VAR || list[1].type != TokenType.SPACE) return null
-
-        return parseSet(list.subList(2, list.size) as MutableList<Token>)
-    }
-
-    /**
-     * Parses a setting based on the following rule:
-     * SET -> NAME 🎞 VALUE
-     *
-     * @author Jonathan Metcalf
-     *
-     * @param toParse the list of tokens
-     * @return the machine code representation of the setting
-     */
-    private fun parseSet(toParse: MutableList<Token>): String? {
-        val list = toParse.filter { it.type != TokenType.SPACE }
-        if (list.isEmpty()) return null
+        if (list.isEmpty() || list[0].type != TokenType.VAR) return null
 
         // Index will be sitting at the equals sign after this
         val index = list.advanceToNext(TokenType.EQUALS)
         if (index == -1) return null
 
         // Check to make sure it is a valid name and value
-        val name = parseName(list.subList(0, index))
+        val name = parseName(list.subList(1, index))
         val expression = parseExpression(list.subList(index + 1, list.size - 1))
-        if (name == null || expression == null) return null
+        if (name == null || expression == null || list[list.size - 1].type != TokenType.SEMICOLON) return null
 
         return "${expression}store ${name}\n"
+    }
+
+    /**
+     * Parses a setting based on the following rule:
+     * SET -> NAME 🎞 EXPRESSION | NAME➕➕ | NAME➖➖ | NAME➕🎞VALUE | NAME➖🎞VALUE  | NAME➗🎞VALUE | NAME✖🎞VALUE
+     *
+     * @author Jonathan Metcalf
+     *
+     * @param list the list of tokens
+     * @return the machine code representation of the setting
+     */
+    private fun parseSet(list: List<Token>): String? {
+        if (list.isEmpty()) return null
+
+        val name = parseName(list.subList(0, list.advanceToNext(TokenType.PLUS)))
+
+        // Checks for NAME++
+        var index = list.advanceToNext(TokenType.PLUS)
+        if (index != -1 &&
+            name != null &&
+            list.size == index + 3 &&
+            list[list.size - 3].type == TokenType.PLUS &&
+            list[list.size - 2].type == TokenType.PLUS &&
+            list[list.size - 1].type == TokenType.SEMICOLON
+        ) return "load 1\nloadr $name\ncall +\nstore $name"
+
+        // Checks for NAME--
+        index = list.advanceToNext(TokenType.PLUS)
+        if (index != -1 &&
+            name != null &&
+            list.size == index + 3 &&
+            list[list.size - 3].type == TokenType.MINUS &&
+            list[list.size - 2].type == TokenType.MINUS &&
+            list[list.size - 1].type == TokenType.SEMICOLON
+        ) return "loadr $name\nload 1\ncall -\nstore $name"
+
+        // todo add x+=, x-=, x*=, x/=
+
+        // Index will be sitting at the equals sign after this
+        index = list.advanceToNext(TokenType.EQUALS, start = 0)
+        if (index == -1) return null
+
+        // Check to make sure it is a valid name and value
+        val expression = parseExpression(list.subList(index + 1, list.size - 1))
+        if (name == null || expression == null || list[list.size - 1].type != TokenType.SEMICOLON) return null
+
+        return "${expression}store $name\n"
     }
 
     /**
@@ -390,7 +398,7 @@ class Parser {
         if (left == null || operator == null || right == null) return null
 
 
-        return "${left}${right}call ${operator}\n"
+        return "${left}${right}${operator}\n"
     }
 
     /**
