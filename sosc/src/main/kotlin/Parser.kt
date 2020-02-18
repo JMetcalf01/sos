@@ -255,8 +255,6 @@ class Parser {
     private fun parseCall(list: List<Token>): String? {
         if (list.isEmpty()) return null
 
-        // todo if it's an operator, don't do call
-
         // Index will be sitting at the left parentheses or space after this
         val index = list.advanceToNext(TokenType.LEFT_PARENTHESES)
         if (index == -1) return null
@@ -405,6 +403,7 @@ class Parser {
                 list[list.size - 1].type == TokenType.SEMICOLON
             ) return "${value}load $name\n${parseOperator(Token(token))}\nstore $name"
         }
+
         return null
     }
 
@@ -423,7 +422,7 @@ class Parser {
         val call = parseCall(list)
         if (call != null) return call
 
-        // todo order of operations correctly
+        // todo order of operations correctly and parentheses
 
         val value = parseValue(list)
         if (value != null) return value
@@ -527,6 +526,8 @@ class Parser {
      * Parses a name by the following rule:
      * NAME -> [❔ (non-keyword)]+
      *
+     * @author Jonathan Metcalf
+     *
      * @param list the list of tokens
      * @return the string representation of the name
      */
@@ -572,7 +573,7 @@ class Parser {
             return list.subList(1, list.size - 1).joinToString("")
 
         // Otherwise, it should only be numbers
-        if (list.joinToString("").matches(Regex("[0-9]+|[0-9]+.[0-9]+")))
+        if (list.joinToString("").matches(Regex("[0-9]+|[0-9]+\\.[0-9]+")))
             return list.joinToString("")
 
         // Otherwise, it doesn't match anything
@@ -589,6 +590,9 @@ class Parser {
  * @param start the starting index to look for
  * @param types the list of tokens that should stop the search
  * @return the index of the first token found that is contained in types, or -1 if not found
+ *
+ * @see TokenType
+ * @see List
  */
 private fun List<Token>.advanceToNext(vararg types: TokenType, start: Int = 0): Int {
     var index = start
@@ -605,6 +609,9 @@ private fun List<Token>.advanceToNext(vararg types: TokenType, start: Int = 0): 
  *
  * @param type the type of token
  * @return the index of the last token, or -1 if not found
+ *
+ * @see TokenType
+ * @see List
  */
 private fun List<Token>.advanceToLast(type: TokenType): Int {
     var index = -1

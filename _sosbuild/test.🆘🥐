@@ -1,8 +1,6 @@
 func main 
-load 📞
-call 🎲
-loadr 12
-+
-load 🅱
-/
+loadr 1
+loadr 0
+==
 store 🅱
+
