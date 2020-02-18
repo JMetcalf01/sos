@@ -28,6 +28,7 @@ C++ Interpreter / Scheduler (.🆘🥐)
 |.🆘|file extension|
 |🔷     | open bracket |
 |🔶		| closing bracket|
+|‼      | semicolon     |
 |☢		|error|
 |🎞		 |equals|
 |➡ 		|import|
