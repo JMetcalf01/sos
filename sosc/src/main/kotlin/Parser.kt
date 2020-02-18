@@ -152,7 +152,11 @@ class Parser {
 
         // Try to figure if it's a multi-line statement
         var index = list.advanceToNext(TokenType.CLOSE_BRACE)
-        if (list.advanceToNext(TokenType.SEMICOLON, start = 0) < list.advanceToNext(TokenType.OPEN_BRACE, start = 0) || index == -1)
+        if (list.advanceToNext(TokenType.SEMICOLON, start = 0) < list.advanceToNext(
+                TokenType.OPEN_BRACE,
+                start = 0
+            ) || index == -1
+        )
             index = list.advanceToNext(TokenType.SEMICOLON)
 
         val first = parseStatement(list.subList(0, index + 1)) ?: return null
@@ -178,8 +182,8 @@ class Parser {
         val whiles = parseWhile(list as MutableList<Token>)
         if (whiles != null) return whiles
 
-        val call = parseCall(list)
-        if (call != null) return call
+        val call = parseCall(list.subList(0, list.size - 1))
+        if (call != null || list[list.size - 1].type != TokenType.SEMICOLON) return call
 
         val declaration = parseDeclaration(list)
         if (declaration != null) return declaration
@@ -236,7 +240,7 @@ class Parser {
         val body = parseBody(list.subList(right + 2, list.size - 1)) ?: return null
 
         // todo fix while loop to actually be the machine code representation using goto
-        return "${expression}while blah blah\n$body"
+        return "${expression}while\n$body"
     }
 
     /**
@@ -262,11 +266,9 @@ class Parser {
 
         // Checks parameters of function
         val end = list.advanceToLast(TokenType.RIGHT_PARENTHESES)
-        if (end == -1) return null
+        if (end == -1 || end != list.size - 1) return null
         var params = parseCallParams(list.subList(index + 1, end))
         if (params == null || params == "null") params = ""
-
-        if (list.size > end + 2 || list[end + 1].type != TokenType.SEMICOLON) return null
 
         return "${params}call $name\n"
     }
@@ -321,7 +323,7 @@ class Parser {
 
     /**
      * Parses a setting based on the following rule:
-     * SET -> NAME 🎞 EXPRESSION | NAME➕➕ | NAME➖➖ | NAME➕🎞VALUE | NAME➖🎞VALUE  | NAME➗🎞VALUE | NAME✖🎞VALUE
+     * SET -> NAME 🎞 EXPRESSION | NAME➕➕ | NAME➖➖ | NAME➕🎞EXPRESSION | NAME➖🎞EXPRESSION  | NAME➗🎞EXPRESSION | NAME✖🎞EXPRESSION
      *
      * @author Jonathan Metcalf
      *
@@ -331,7 +333,10 @@ class Parser {
     private fun parseSet(list: List<Token>): String? {
         if (list.isEmpty()) return null
 
-        val name = parseName(list.subList(0, list.advanceToNext(TokenType.PLUS)))
+        val plus = list.advanceToNext(TokenType.PLUS)
+        var name: String? = null
+        if (plus != -1)
+            name = parseName(list.subList(0, plus))
 
         // Checks for NAME++
         var index = list.advanceToNext(TokenType.PLUS)
@@ -341,7 +346,7 @@ class Parser {
             list[list.size - 3].type == TokenType.PLUS &&
             list[list.size - 2].type == TokenType.PLUS &&
             list[list.size - 1].type == TokenType.SEMICOLON
-        ) return "load 1\nloadr $name\n+\nstore $name"
+        ) return "loadr $name\nload 1\n+\nstore $name"
 
         // Checks for NAME--
         index = list.advanceToNext(TokenType.PLUS)
@@ -353,13 +358,26 @@ class Parser {
             list[list.size - 1].type == TokenType.SEMICOLON
         ) return "loadr $name\nload 1\n-\nstore $name"
 
-        // todo add x+=, x-=, x*=, x/=
+        // Checks for NAME+=EXPRESSION
+        val plusString = parseAssignment(list, TokenType.PLUS)
+        if (plusString != null) return plusString
 
-        // Index will be sitting at the equals sign after this
-        index = list.advanceToNext(TokenType.EQUALS, start = 0)
+        // Checks for NAME-=EXPRESSION
+        val minusString = parseAssignment(list, TokenType.MINUS)
+        if (minusString != null) return minusString
+
+        // Checks for NAME*=EXPRESSION
+        val multiplyString = parseAssignment(list, TokenType.MULTIPLY)
+        if (multiplyString != null) return multiplyString
+
+        // Checks for NAME/=EXPRESSION
+        val divideString = parseAssignment(list, TokenType.DIVIDE)
+        if (divideString != null) return divideString
+
+        // Else, check to make sure it is a valid name and value
+        index = list.advanceToNext(TokenType.EQUALS)
         if (index == -1) return null
-
-        // Check to make sure it is a valid name and value
+        name = parseName(list.subList(0, index))
         val expression = parseExpression(list.subList(index + 1, list.size - 1))
         if (name == null || expression == null || list[list.size - 1].type != TokenType.SEMICOLON) return null
 
@@ -367,8 +385,32 @@ class Parser {
     }
 
     /**
+     * Parses NAME+=VALUE, NAME-=VALUE, NAME*=VALUE, NAME/=VALUE.
+     *
+     * @author Jonathan Metcalf
+     *
+     * @param list the list to check
+     * @param token either plus, minus, multiply, or divide
+     * @return the string representation of the assignment
+     */
+    private fun parseAssignment(list: List<Token>, token: TokenType): String? {
+        val index = list.advanceToNext(token)
+        if (index != -1) {
+            val name = parseName(list.subList(0, index))
+            val value = parseExpression(list.subList(index + 2, list.size - 1))
+            if (name != null &&
+                value != null &&
+                list[index].type == token &&
+                list[index + 1].type == TokenType.EQUALS &&
+                list[list.size - 1].type == TokenType.SEMICOLON
+            ) return "${value}load $name\n${parseOperator(Token(token))}\nstore $name"
+        }
+        return null
+    }
+
+    /**
      * Parses an expression by the following rule:
-     * EXPRESSION -> VALUE | EXPRESSION OPERATOR EXPRESSION
+     * EXPRESSION -> VALUE | CALL | EXPRESSION OPERATOR EXPRESSION
      *
      * @author Jonathan Metcalf
      *
@@ -378,7 +420,10 @@ class Parser {
     private fun parseExpression(list: List<Token>): String? {
         if (list.isEmpty()) return null
 
-        // todo order of operations correctly, and make functions integrated into expressions (as functions can return values)
+        val call = parseCall(list)
+        if (call != null) return call
+
+        // todo order of operations correctly
 
         val value = parseValue(list)
         if (value != null) return value
