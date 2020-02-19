@@ -353,25 +353,11 @@ class Parser {
         if (plus != -1)
             name = parseName(list.subList(0, plus))
 
-        // Checks for NAME++
-        var index = list.advanceToNext(TokenType.PLUS)
-        if (index != -1 &&
-            name != null &&
-            list.size == index + 3 &&
-            list[list.size - 3].type == TokenType.PLUS &&
-            list[list.size - 2].type == TokenType.PLUS &&
-            list[list.size - 1].type == TokenType.SEMICOLON
-        ) return "loadr $name\nload 1\ncall +\nstore $name"
+        val inc = parseIncDec(list, name, TokenType.PLUS)
+        if (inc != null) return inc
 
-        // Checks for NAME--
-        index = list.advanceToNext(TokenType.PLUS)
-        if (index != -1 &&
-            name != null &&
-            list.size == index + 3 &&
-            list[list.size - 3].type == TokenType.MINUS &&
-            list[list.size - 2].type == TokenType.MINUS &&
-            list[list.size - 1].type == TokenType.SEMICOLON
-        ) return "loadr $name\nload 1\ncall -\nstore $name"
+        val dec = parseIncDec(list, name, TokenType.MINUS)
+        if (dec != null) return dec
 
         // Checks for NAME+=EXPRESSION
         val plusString = parseAssignment(list, TokenType.PLUS)
@@ -390,13 +376,36 @@ class Parser {
         if (divideString != null) return divideString
 
         // Else, check to make sure it is a valid name and value
-        index = list.advanceToNext(TokenType.EQUALS)
+        val index = list.advanceToNext(TokenType.EQUALS)
         if (index == -1) return null
         name = parseName(list.subList(0, index))
         val expression = parseExpression(list.subList(index + 1, list.size - 1))
         if (name == null || expression == null || list[list.size - 1].type != TokenType.SEMICOLON) return null
 
         return "${expression}store $name\n"
+    }
+
+    /**
+     * Parses NAME++ and NAME--.
+     *
+     * @author Jonathan Metcalf
+     *
+     * @param list the list to be parsed
+     * @param name the name of the variable
+     * @param token either plus (++) or minus (--)
+     * @return the string representation of the inc/dec
+     */
+    private fun parseIncDec(list: List<Token>, name: String?, token: TokenType): String? {
+        // Checks for NAME++
+        val index = list.advanceToNext(token)
+        if (index != -1 &&
+            name != null &&
+            list.size == index + 3 &&
+            list[list.size - 3].type == token &&
+            list[list.size - 2].type == token &&
+            list[list.size - 1].type == TokenType.SEMICOLON
+        ) return "loadr $name\nload 1\ncall +\nstore $name"
+        return null
     }
 
     /**
