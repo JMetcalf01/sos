@@ -16,6 +16,10 @@ namespace sos {
 
         static void printr(VariableStack* stack);
 
+        static void read(VariableStack* stack);
+
+        static void kill(VariableStack* stack);
+
         // !
         // Inverts a 1 or a 0 on the stack.
         static void invert(VariableStack* stack);

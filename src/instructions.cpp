@@ -40,14 +40,6 @@ void sos::Instructions::loadr(std::map<std::string, std::string> *memory, sos::V
     stack->load(value);
 }
 
-void sos::Instructions::read(std::map<std::string, std::string> *memory, sos::VariableStack *stack, int *cursor,
-                             std::vector<std::string> params) {
-    std::string value;
-    std::cin >> value;
-//    getline(std::cin, value);
-    stack->load(value);
-}
-
 void sos::Instructions::go(std::map<std::string, std::string> *memory, sos::VariableStack *stack, int *cursor,
                            std::vector<std::string> params) {
     *cursor = std::stoi(params[0]) - 1;

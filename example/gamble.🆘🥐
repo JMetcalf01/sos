@@ -10,19 +10,19 @@ call 🖨
 exit
 load 💰
 call 🤑
-read
+call 💬
 store 💸
 load 💸
 load 💰
 call >
 goto 18
 goto 22
-read
+call 💬
 store 💸
 goto 13
 loadr Enter a number to bet on [1-6]:
 call 🖨
-read
+call 💬
 store 🔢
 load 🔢
 loadr 1
@@ -35,7 +35,7 @@ load 125152
 call ||
 goto 36
 goto 39
-read
+call 💬
 store 🔢
 goto 25
 load 5

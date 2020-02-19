@@ -30,13 +30,14 @@ int main() {
     instruction("store", Instructions::store);
     instruction("load", Instructions::load);
     instruction("loadr", Instructions::loadr);
-    instruction("read", Instructions::read);
     instruction("goto", Instructions::go);
     instruction("if", Instructions::ifelse);
 
     // Load Native Functions
     native("🖨", NativeFunction::print);
     native("📄", NativeFunction::printr);
+    native("💬", NativeFunction::read);
+    native("💀", NativeFunction::kill);
     native("!", NativeFunction::invert);
     native("&&", NativeFunction::boolAnd);
     native("||", NativeFunction::boolOr);
@@ -101,8 +102,8 @@ std::vector<std::string>  readFile()
 {
     std::vector<std::string> linesImport;
 
-    std::ifstream file("/Users/mattworzala/dev/cpp/sos/test.txt");
-//    std::ifstream file("/Users/mattworzala/dev/cpp/sos/example/gamble.🆘🥐");
+//    std::ifstream file("/Users/mattworzala/dev/cpp/sos/test.txt");
+    std::ifstream file("/Users/mattworzala/dev/cpp/sos/example/gamble.🆘🥐");
     std::string str;
     while (std::getline(file, str)) {
         linesImport.push_back(str);

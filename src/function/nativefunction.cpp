@@ -8,6 +8,17 @@ void sos::NativeFunction::printr(sos::VariableStack *stack) {
     std::cout << stack->take();
 }
 
+void sos::NativeFunction::read(sos::VariableStack *stack) {
+    std::string value;
+    std::cin >> value;
+//    getline(std::cin, value);
+    stack->load(value);
+}
+
+void sos::NativeFunction::kill(sos::VariableStack *stack) {
+    exit(0);
+}
+
 void sos::NativeFunction::invert(VariableStack* stack) {
     stack->load(stack->take() == "0");
 }

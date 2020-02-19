@@ -28,10 +28,6 @@ namespace sos {
         // Load a raw value to the "stack"
         static void loadr(std::map<std::string, std::string>* memory, VariableStack* stack, int* cursor, std::vector<std::string> params);
 
-        // read VAR_NAME
-        // Reads a line of user input and assigns the value to the variable.
-        static void read(std::map<std::string, std::string>* memory, VariableStack* stack, int* cursor, std::vector<std::string> params);
-
         // goto LINE_NUMBER
         // Go to a defined position (it may be defined after the goto, and will be searched).
         static void go(std::map<std::string, std::string>* memory, VariableStack* stack, int* cursor, std::vector<std::string> params);
