@@ -150,13 +150,14 @@ class Parser {
     private fun parseBody(list: MutableList<Token>): String? {
         if (list.isEmpty()) return null
 
+        // todo make it parse if else as one statement
+
+
         // Try to figure if it's a multi-line statement
         var index = list.advanceToNext(TokenType.CLOSE_BRACE)
-        if (list.advanceToNext(TokenType.SEMICOLON, start = 0) < list.advanceToNext(
-                TokenType.OPEN_BRACE,
-                start = 0
-            ) || index == -1
-        )
+        if (list.size > index + 1 && list[index + 1].type == TokenType.ELSE)
+            index = list.advanceToNext(TokenType.CLOSE_BRACE, start = index + 1)
+        else if (list.advanceToNext(TokenType.SEMICOLON) < list.advanceToNext(TokenType.OPEN_BRACE) || index == -1)
             index = list.advanceToNext(TokenType.SEMICOLON)
 
         val first = parseStatement(list.subList(0, index + 1)) ?: return null
@@ -210,10 +211,26 @@ class Parser {
      * @return the machine code representation of the if statement
      */
     private fun parseIf(list: List<Token>): String? {
-        if (list.isEmpty()) return null
+        if (list.isEmpty() || list[0].type != TokenType.IF || list[1].type != TokenType.LEFT_PARENTHESES) return null
 
-        // todo if statement
-        return null
+        // Gets expression
+        val index = list.advanceToNext(TokenType.RIGHT_PARENTHESES)
+        if (index == -1) return null
+        val expression = parseExpression(list.subList(2, index)) ?: return null
+
+        // Gets body
+        if (list[index + 1].type != TokenType.OPEN_BRACE) return null
+        var end = list.advanceToNext(TokenType.ELSE) - 1
+        if (end == -2) end = list.advanceToLast(TokenType.CLOSE_BRACE)
+
+        val ifBody = parseBody(list.subList(index + 2, end) as MutableList<Token>)
+        end = list.advanceToNext(TokenType.ELSE)
+        var elseBody: String? = ""
+        if (end != -1) elseBody = parseBody(list.subList(end + 2, list.size - 1) as MutableList<Token>)
+        if (elseBody == null) return null
+
+        // todo goto
+        return "${expression}if\ngoto (linecount + 1)\ngoto (linecount + 2 + ifBody length)\n$ifBody$elseBody"
     }
 
     /**
@@ -344,7 +361,7 @@ class Parser {
             list[list.size - 3].type == TokenType.PLUS &&
             list[list.size - 2].type == TokenType.PLUS &&
             list[list.size - 1].type == TokenType.SEMICOLON
-        ) return "loadr $name\nload 1\n+\nstore $name"
+        ) return "loadr $name\nload 1\ncall +\nstore $name"
 
         // Checks for NAME--
         index = list.advanceToNext(TokenType.PLUS)
@@ -354,7 +371,7 @@ class Parser {
             list[list.size - 3].type == TokenType.MINUS &&
             list[list.size - 2].type == TokenType.MINUS &&
             list[list.size - 1].type == TokenType.SEMICOLON
-        ) return "loadr $name\nload 1\n-\nstore $name"
+        ) return "loadr $name\nload 1\ncall -\nstore $name"
 
         // Checks for NAME+=EXPRESSION
         val plusString = parseAssignment(list, TokenType.PLUS)
@@ -401,7 +418,7 @@ class Parser {
                 list[index].type == token &&
                 list[index + 1].type == TokenType.EQUALS &&
                 list[list.size - 1].type == TokenType.SEMICOLON
-            ) return "${value}load $name\n${parseOperator(Token(token))}\nstore $name"
+            ) return "${value}load $name\ncall ${parseOperator(Token(token))}\nstore $name"
         }
 
         return null
@@ -442,7 +459,7 @@ class Parser {
         if (left == null || operator == null || right == null) return null
 
 
-        return "${left}${right}${operator}\n"
+        return "${left}${right}call ${operator}\n"
     }
 
     /**
@@ -641,4 +658,19 @@ private fun List<Token>.nextIndexOf(start: Int, vararg matches: TokenType): Int 
             return i
     }
     return start + 1
+}
+
+/**
+ * Holds the line count in an object so when it is passed into a function and the function edits
+ * it, it actually edits it in the outer function as well.
+ *
+ * @author Jonathan Metcalf
+ *
+ * @property lineCount the current lineCount of each function
+ */
+private class LineCount(var lineCount: Int = 0) {
+    operator fun inc(): LineCount {
+        lineCount++
+        return this
+    }
 }

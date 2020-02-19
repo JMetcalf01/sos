@@ -1,6 +1,12 @@
-func main 
-loadr 1
-loadr 0
-==
-store 🅱
+func ⬆ ❤ 💙
+load ❤
+load 💙
+call <
+if
+goto (linecount + 1)
+goto (linecount + 2 + ifBody length)
+load 💙
+exit
+load ❤
+exit
 
