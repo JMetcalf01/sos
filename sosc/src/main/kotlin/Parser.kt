@@ -20,7 +20,31 @@ class Parser {
     fun parseFile(list: MutableList<Token>): String? {
         if (list.isEmpty()) return null
 
-        // Does some cleaning up before it parses it
+        // Cleans up file
+        list.removeAll(cleanFile(list))
+
+        if (list[0].type != TokenType.FUNCTION) return null
+        val index = list.advanceToNext(TokenType.FUNCTION, start = 1)
+
+        // If there is no second function, parse all of it as one function
+        if (index == -1) return "${parseFunction(list.subList(0, list.size))}"
+
+        // Otherwise recursively parse all of the functions
+        val first = parseFunction(list.subList(0, index)) ?: return null
+        val body = parseFile(list.subList(index, list.size)) ?: return first
+        return "$first\n$body"
+    }
+
+    /**
+     * Returns a list of elements to remove given a list in order
+     * to clean up the list and make parsing simpler
+     *
+     * @author Jonathan Metcalf
+     *
+     * @param list the list to clean up
+     * @return a list of the elements to remove
+     */
+    private fun cleanFile(list: List<Token>): List<Token> {
         val remove = mutableListOf<Token>()
         var inString = false
         var inParams = false
@@ -64,18 +88,7 @@ class Parser {
 
             i++
         }
-        list.removeAll(remove)
-
-        if (list[0].type != TokenType.FUNCTION) return null
-        val index = list.advanceToNext(TokenType.FUNCTION, start = 1)
-
-        // If there is no second function, parse all of it as one function
-        if (index == -1) return "${parseFunction(list.subList(0, list.size))}"
-
-        // Otherwise recursively parse all of the functions
-        val first = parseFunction(list.subList(0, index)) ?: return null
-        val body = parseFile(list.subList(index, list.size)) ?: return first
-        return "$first\n$body"
+        return remove;
     }
 
     /**
